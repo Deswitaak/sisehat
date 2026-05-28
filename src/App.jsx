@@ -9,7 +9,7 @@ import Asesmen from "./pages/asesmen"; // 🔥 WAJIB
 import Hasil from "./pages/hasil";
 import ProfilSelesai from "./pages/profilSelesai";
 import Settings from "./pages/settings";
-import EditProfil from "./pages/Editprofil";
+import EditProfile from "./pages/EditProfil";
 import Perbandingan from "./pages/perbandingan";
 import Rekomendasi from "./pages/rekomendasi";
 import Eksplorasi from "./pages/eksplorasi";
@@ -38,7 +38,7 @@ function App() {
         <Route path="/eksplorasi" element={<Eksplorasi />} />
          <Route path="/detailumkm" element={<DetailUMKM />}/>
         <Route path="/settings" element={<Settings />} />
-        <Route path="/profil" element={<EditProfil />} />
+        <Route path="/profil" element={<EditProfile />} />
       
 
       </Routes>
