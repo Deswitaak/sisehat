@@ -14,7 +14,7 @@ $json_path = '../src/data/raw_data.json';
 if (!file_exists($json_path)) {
     echo json_encode([
         "status" => "error",
-        "message" => "File raw_data.json tidak ditemukan di folder src/data/. Pastikan letak file sudah benar."
+        "message" => "File raw_data.json tidak ditemukan di folder src/data/. Pastikan lokasi file sudah benar."
     ]);
     exit;
 }
@@ -87,18 +87,17 @@ foreach ($data_array as $item) {
         $status = "Perlu Perhatian";
     }
 
-    // VALIDASI INTEGRITAS DATA (Foreign Key Check): Pastikan id_user terkait sudah ada di tabel 'users' & 'usaha'
-    $check_user = mysqli_query($conn, "SELECT id_user FROM users WHERE id_user = $id_user");
-    if (mysqli_num_rows($check_user) == 0) {
-        // Daftarkan akun otentikasi dasar agar relasi database MySQL tidak crash terputus
-        $dummy_username = "user_umkm_" . $id_user;
-        $dummy_password = password_hash("rahasia123", PASSWORD_BCRYPT);
-        mysqli_query($conn, "INSERT INTO users (id_user, username, password) VALUES ($id_user, '$dummy_username', '$dummy_password')");
+    // VALIDASI USER (Anti-Duplicate): Gunakan INSERT IGNORE agar tidak memicu fatal error jika ID sudah ada
+    $dummy_username = "user_umkm_" . $id_user;
+    $dummy_password = password_hash("rahasia123", PASSWORD_BCRYPT);
+    mysqli_query($conn, "INSERT IGNORE INTO users (id_user, username, password) VALUES ($id_user, '$dummy_username', '$dummy_password')");
 
-        // Daftarkan profil badan usaha pelengkap untuk menyuplai umpan data menu halaman Eksplorasi
-        $dummy_nama_usaha = "UMKM Mitra sisehat " . $id_user;
-        mysqli_query($conn, "INSERT INTO usaha (id_user, nama_usaha, kategori, jenis_usaha, lama_usaha, role) 
-                            VALUES ($id_user, '$dummy_nama_usaha', 'Kuliner', 'Usaha Mikro', 3, 'Pemilik')");
+    // VALIDASI PROFIL USAHA (Anti-Duplicate): Cek apakah data usaha untuk id_user ini sudah dibuat
+    $check_usaha = mysqli_query($conn, "SELECT id_user FROM usaha WHERE id_user = $id_user");
+    if (mysqli_num_rows($check_usaha) == 0) {
+        $dummy_nama_usaha = "UMKM Mitra SISEHAT " . $id_user;
+        mysqli_query($conn, "INSERT INTO usaha (id_user, nama_usaha, kategori, jenis_usaha, lama_usaha, usia_pemilik, posisi, jenis_kelamin) 
+                            VALUES ($id_user, '$dummy_nama_usaha', 'Kuliner', 'Usaha Mikro', 3, 25, 'Pemilik', 'Laki-laki')");
     }
 
     // Mengikat parameter data bertipe data dinamis (integer, double, string) ke dalam query SQL
@@ -113,5 +112,5 @@ mysqli_stmt_close($stmt_insert);
 
 echo json_encode([
     "status" => "success",
-    "message" => "Migrasi Ratusan Data Sukses! Berhasil mengonversi dan mengunggah $success_count baris data asesmen ke MySQL. (Dilewati/Meta string: $skipped_count)"
+    "message" => "Migrasi Selesai! Berhasil mengonversi dan menambahkan $success_count data asesmen baru ke MySQL. (Dilewati: $skipped_count)"
 ]);
