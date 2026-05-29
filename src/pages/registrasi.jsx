@@ -31,37 +31,35 @@ export default function Registrasi() {
     }
 
     try {
-      // Mengirim data ke API register.php
-      const response = await fetch('http://localhost/sisehat-main/api-sisehat/register.php', {
+      // 1. Mengirim data ke API register.php (URL disesuaikan dengan folder XAMPP asli kamu)
+      const response = await fetch('http://localhost/sisehat/api-sisehat/register.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          full_name: form.name,
+          fullName: form.name,       // Mencocokkan dengan $_DATA['fullName'] di register.php
           email: form.email,
-          whatsapp_number: form.phone,
+          whatsapp: form.phone,      // Mencocokkan dengan $_DATA['whatsapp'] di register.php
           password: form.password
         }),
       });
 
-      // Mengambil respon dari server
+      // 2. Mengambil respon JSON dari server
       const result = await response.json();
 
-      if (result.status === "success") {
-        // Simpan ke localStorage sebagai data cadangan (opsional)
-        localStorage.setItem("user", JSON.stringify(form));
-        localStorage.setItem("profileData", JSON.stringify({ nama: form.name }));
-
-        alert("Registrasi berhasil! Silakan login.");
+      // 3. Logika pengecekan status dari backend PHP
+      if (result.status === 'success') {
+        alert(result.message || 'Registrasi Berhasil! Silakan login.');
         navigate("/login");
       } else {
-        // Jika gagal karena email sudah terdaftar atau masalah database lainnya
-        alert("Gagal Registrasi: " + result.message);
+        // Menampilkan pesan error asli dari PHP (Misal: "Nama atau Email sudah terdaftar")
+        alert(result.message || 'Gagal melakukan pendaftaran.');
       }
+
     } catch (error) {
-      console.error("Error koneksi ke API:", error);
-      alert("Tidak dapat terhubung ke server. Pastikan XAMPP (Apache & MySQL) sudah aktif.");
+      console.error("Error registrasi:", error);
+      alert('Tidak dapat terhubung ke server. Pastikan XAMPP (Apache & MySQL) sudah aktif.');
     }
   };
 

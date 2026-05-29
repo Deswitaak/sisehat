@@ -10,7 +10,7 @@ export default function Asesmen() {
   const userData = JSON.parse(localStorage.getItem("user"));
   
   const role = profileData?.role || "Pemilik";
-  const userId = userData?.id;
+  const userId = userData?.id || 1; // Fallback ke ID 1 jika localStorage kosong agar backend tidak mendeteksi data null
 
   // =========================================================
   // PERTANYAAN OWNER & KARYAWAN
@@ -144,13 +144,13 @@ export default function Asesmen() {
 
       const avg = resultFactors.reduce((acc, r) => acc + r.score, 0) / resultFactors.length;
 
-      // 2. KIRIM KE BACK END (predict.php)
+      // 2. KIRIM KE BACK END
       try {
-        const response = await fetch('http://localhost/sisehat-main/api-sisehat/predict.php', {
+        const response = await fetch('http://localhost/sisehat/api-sisehat/save_assessment.php', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user_id: userId,
+            id_user: userId, // Diubah dari user_id menjadi id_user agar sesuai format PHP/MySQL
             role: role,
             answers: answers // Mengirim semua mentah jawaban untuk diolah PHP
           }),

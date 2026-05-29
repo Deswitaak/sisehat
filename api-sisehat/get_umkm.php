@@ -1,11 +1,21 @@
 <?php
+// Pengaturan CORS agar bisa diakses oleh React Frontend (Port 5173)
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; charset=UTF-8");
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 /** @var \mysqli $conn */
 include 'config.php';
 
-$query = "SELECT u.id_user AS id, u.nama_usaha, u.kategori, u.jenis_usaha, u.lama_usaha, u.role, 
+// SQL Query mengambil profil usaha dan JOIN dengan data asesmen paling terakhir (latest)
+// PERBAIKAN: Mengubah u.role menjadi u.posisi agar sesuai dengan struktur tabel terbaru
+$query = "SELECT u.id_user AS id, u.nama_usaha, u.kategori, u.jenis_usaha, u.lama_usaha, u.posisi,
                  a.total_score, a.status, a.ov_score, a.li_score, a.ir_score, a.ep_score, a.os_score, a.qw_score
           FROM usaha u
           INNER JOIN asesmen a ON u.id_user = a.id_user
@@ -22,7 +32,7 @@ if ($result) {
             "kategori" => $row['kategori'],
             "jenis_usaha" => $row['jenis_usaha'],
             "lama_usaha" => intval($row['lama_usaha']),
-            "role" => $row['role'],
+            "posisi" => $row['posisi'], // PERBAIKAN: Menggunakan key posisi
             "total_score" => floatval($row['total_score']),
             "status" => $row['status'],
             "factors" => [
