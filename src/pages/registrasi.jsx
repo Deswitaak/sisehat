@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { User, Mail, Phone, Lock, Eye, EyeOff } from "lucide-react";
+import RegistrasiMobile from "./RegistrasiMobile";
 
 export default function Registrasi() {
   const [showPassword, setShowPassword] = useState(false);
@@ -62,6 +63,18 @@ export default function Registrasi() {
       alert('Tidak dapat terhubung ke server. Pastikan XAMPP (Apache & MySQL) sudah aktif.');
     }
   };
+  
+if (window.innerWidth < 768) {
+  return (
+    <RegistrasiMobile
+      form={form}
+      setForm={setForm}
+      showPassword={showPassword}
+      setShowPassword={setShowPassword}
+      handleRegister={handleRegister}
+    />
+  );
+}
 
   return (
     <div className="min-h-screen flex">

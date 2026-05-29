@@ -17,6 +17,9 @@ export default function NavbarDashboard() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const [mobileMenu, setMobileMenu] =
+  useState(false);
+
   const [open, setOpen] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
 
@@ -67,18 +70,18 @@ export default function NavbarDashboard() {
 
   return (
     <>
-      <nav className="flex justify-between items-center px-12 py-5 bg-white shadow-sm relative">
+     <nav className="flex justify-between items-center px-4 md:px-12 py-4 md:py-5">
 
         {/* LOGO */}
         <h1
   onClick={() => navigate("/beranda")}
-  className="font-bold text-lg text-blue-900 cursor-pointer"
+  className="font-bold text-xl text-blue-900 cursor-pointer"
 >
   SiSehat
 </h1>
 
         {/* MENU */}
-        <div className="flex gap-4 md:gap-8 text-sm">
+        <div className="hidden md:flex gap-4 md:gap-8 text-sm">
 
           {menu.map((item) => {
 
@@ -101,6 +104,19 @@ export default function NavbarDashboard() {
           })}
 
         </div>
+
+        <div className="md:hidden">
+
+  <button
+    onClick={() =>
+      setMobileMenu(true)
+    }
+    className="text-3xl font-bold"
+  >
+    ☰
+  </button>
+
+</div>
 
         {/* RIGHT */}
         <div
@@ -210,7 +226,67 @@ export default function NavbarDashboard() {
           )}
 
         </div>
+{mobileMenu && (
+  <div className="fixed inset-0 bg-black/40 z-50">
 
+    <div className="absolute right-0 top-0 h-full w-72 bg-white p-6 shadow-xl">
+
+      <button
+        onClick={() =>
+          setMobileMenu(false)
+        }
+        className="text-2xl"
+      >
+        ✕
+      </button>
+
+      <div className="mt-8 flex flex-col gap-5">
+
+        {menu.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            onClick={() =>
+              setMobileMenu(false)
+            }
+          >
+            {item.name}
+          </Link>
+        ))}
+
+      </div>
+
+      <div className="border-t mt-8 pt-4 flex flex-col gap-3">
+
+        <button
+          onClick={() => navigate("/profil")}
+          className="text-left"
+        >
+          👤 Edit Profil
+        </button>
+
+        <button
+          onClick={() => navigate("/settings")}
+          className="text-left"
+        >
+          ⚙️ Settings
+        </button>
+
+        <button
+          onClick={() =>
+            setShowLogout(true)
+          }
+          className="text-left text-red-500"
+        >
+          🚪 Keluar
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
       </nav>
 
       {/* MODAL */}

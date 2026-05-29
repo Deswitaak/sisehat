@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import LoginMobile from "./LoginMobile";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -71,6 +72,18 @@ if (result.status === "success") {
       alert("Tidak dapat terhubung ke server. Pastikan Apache & MySQL di XAMPP sudah menyala.");
     }
   };
+
+  if (window.innerWidth < 768) {
+  return (
+    <LoginMobile
+      form={form}
+      setForm={setForm}
+      showPassword={showPassword}
+      setShowPassword={setShowPassword}
+      handleLogin={handleLogin}
+    />
+  );
+}
 
   return (
     <div className="min-h-screen flex">
