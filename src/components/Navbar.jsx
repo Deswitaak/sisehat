@@ -42,11 +42,14 @@ export default function Navbar({ active }) {
         <div className="flex items-center gap-4">
           ⚙️
           <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
-            <span className="text-sm">Budi Santoso</span>
-            <img
-              src="https://i.pravatar.cc/40"
-              className="w-8 h-8 rounded-full"
-            />
+            <span className="text-sm">
+  {JSON.parse(localStorage.getItem("user"))?.name || "User"}
+</span>
+            <div className="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center text-sm font-bold">
+  {(JSON.parse(localStorage.getItem("user"))?.name || "U")
+    .charAt(0)
+    .toUpperCase()}
+</div>
           </div>
         </div>
       )}

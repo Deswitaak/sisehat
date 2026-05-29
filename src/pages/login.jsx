@@ -22,7 +22,7 @@ export default function Login() {
 
     try {
       // Mengirim data login ke API login.php
-      const response = await fetch('http://localhost/sisehat-main/api-sisehat/login.php', {
+      const response = await fetch('http://localhost/sisehat/api-sisehat/login.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,18 +35,34 @@ export default function Login() {
 
       // Mengambil respon JSON dari PHP
       const result = await response.json();
+if (result.status === "success") {
 
-      if (result.status === "success") {
-        // Simpan status login dan data user ke localStorage
-        localStorage.setItem("isLogin", "true");
-        localStorage.setItem("user", JSON.stringify(result.user));
-        
-        // Simpan nama untuk keperluan profil di dashboard
-        localStorage.setItem("profileData", JSON.stringify({ nama: result.user.full_name }));
+  localStorage.setItem("isLogin", "true");
 
-        alert("Login Berhasil!");
-        navigate("/beranda"); // Pindah ke halaman beranda/dashboard
-      } else {
+  localStorage.setItem(
+    "user",
+    JSON.stringify(result.user)
+  );
+
+  localStorage.setItem(
+    "profileComplete",
+    result.profileComplete ? "true" : "false"
+  );
+
+  localStorage.setItem(
+    "profileData",
+    JSON.stringify({
+      nama: result.user.username
+    })
+  );
+
+  alert("Login Berhasil!");
+
+  navigate("/beranda");
+
+}
+      
+      else {
         // Tampilkan pesan error dari PHP (Email/Password salah)
         alert("Gagal Login: " + result.message);
       }

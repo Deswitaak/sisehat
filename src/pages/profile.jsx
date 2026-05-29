@@ -20,6 +20,7 @@ export default function Profil() {
   const [formData, setFormData] = useState({
     namaUsaha: "",
     jenisUsaha: "",
+    kategori: "",
     lamaUsaha: "",
     usia: "",
     gender: "Perempuan",
@@ -35,45 +36,90 @@ export default function Profil() {
   };
 
   // 🔥 SUBMIT
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
 
-    if (
-      !formData.namaUsaha ||
-      !formData.jenisUsaha ||
-      !formData.lamaUsaha ||
-      !formData.usia
-    ) {
-      alert("Semua field wajib diisi");
+  if (
+    !formData.namaUsaha ||
+    !formData.jenisUsaha ||
+    !formData.kategori ||
+    !formData.lamaUsaha ||
+    !formData.usia
+  ) {
+    alert("Semua field wajib diisi");
+    return;
+  }
+
+  if (!role) {
+    alert("Pilih posisi terlebih dahulu");
+    return;
+  }
+
+  try {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    if (!user) {
+      alert("User tidak ditemukan, silakan login ulang");
       return;
     }
 
-    if (!role) {
-      alert("Pilih posisi terlebih dahulu");
-      return;
-    }
-
-    // 🔥 SIMPAN STATUS
-    localStorage.setItem(
-      "profileComplete",
-      "true"
+    const response = await fetch(
+      "http://localhost/sisehat/api-sisehat/save_profile.php",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id_user: user.id_user,
+          nama_usaha: formData.namaUsaha,
+          kategori: formData.kategori,
+          jenis_usaha: formData.jenisUsaha,
+          lama_usaha: parseInt(formData.lamaUsaha),
+          usia_pemilik: parseInt(formData.usia),
+          posisi: role,
+          jenis_kelamin: formData.gender,
+        }),
+      }
     );
 
-    // 🔥 SIMPAN PROFILE
-const oldData = JSON.parse(
-  localStorage.getItem("profileData")
-);
+    const result = await response.json();
 
-localStorage.setItem(
-  "profileData",
-  JSON.stringify({
-    ...oldData,
-    ...formData,
-    role,
-  })
-);
+    if (result.status === "success") {
 
-    navigate("/profil-selesai");
-  };
+      localStorage.setItem(
+        "profileComplete",
+        "true"
+      );
+
+      const oldData =
+        JSON.parse(localStorage.getItem("profileData")) || {};
+
+      localStorage.setItem(
+        "profileData",
+        JSON.stringify({
+          ...oldData,
+          ...formData,
+          role,
+        })
+      );
+
+      alert("Profil berhasil disimpan");
+      navigate("/profil-selesai");
+
+    } else {
+
+      alert(result.message);
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+    alert("Gagal terhubung ke server");
+
+  }
+};
 
   return (
     <div className="bg-[#f4f7fb] min-h-screen flex flex-col">
@@ -165,8 +211,58 @@ localStorage.setItem(
                 value={formData.jenisUsaha}
                 onChange={handleChange}
                 className="w-full p-2 mt-1 border rounded-lg bg-gray-50"
-                placeholder="Retail / Jasa / dll"
+                placeholder="Contoh: Coffee Shop"
               />
+
+            </div>
+
+            {/* KATEGORI UMKM */}
+            <div>
+
+              <label className="text-sm font-medium">
+                Kategori UMKM
+              </label>
+
+              <select
+                name="kategori"
+                value={formData.kategori}
+                onChange={handleChange}
+                className="w-full p-2 mt-1 border rounded-lg bg-gray-50"
+              >
+
+                <option value="">
+                  Pilih kategori
+                </option>
+
+                <option value="Kuliner">
+                  Kuliner
+                </option>
+
+                <option value="Fashion">
+                  Fashion
+                </option>
+
+                <option value="Retail">
+                  Retail
+                </option>
+
+                <option value="Jasa">
+                  Jasa
+                </option>
+
+                <option value="Kerajinan">
+                  Kerajinan
+                </option>
+
+                <option value="Teknologi">
+                  Teknologi
+                </option>
+
+                <option value="Lainnya">
+                  Lainnya
+                </option>
+
+              </select>
 
             </div>
 

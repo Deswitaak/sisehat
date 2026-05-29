@@ -5,17 +5,16 @@ export default function Rekomendasi() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 🔥 ambil dari localStorage + state
   const saved = JSON.parse(localStorage.getItem("hasilAnalisis"));
 
   const factors = location.state?.factors || saved?.factors || [];
   const total = location.state?.total || saved?.total || 0;
 
-  // ✅ FIX: return hanya jika benar-benar kosong
   if (!factors.length) {
     return (
       <div className="p-10">
         <p>Data tidak ditemukan. Silakan lakukan asesmen terlebih dahulu.</p>
+
         <button
           onClick={() => navigate("/asesmen")}
           className="mt-4 bg-blue-900 text-white px-4 py-2 rounded"
@@ -26,41 +25,64 @@ export default function Rekomendasi() {
     );
   }
 
-  // 🔥 normalize biar aman
   const normalize = (text) => text.toLowerCase().trim();
 
-  // 🔥 mapping rekomendasi
   const rekomendasiMap = {
-    "organization values": [
-      "Program Culture Hero",
-      "Integrasi nilai ke KPI",
+    "organizational values": [
+      "Tingkatkan komunikasi dan kolaborasi antar anggota tim.",
+      "Bangun budaya saling percaya dan saling menghargai.",
+      "Lakukan kegiatan internal untuk memperkuat nilai organisasi.",
     ],
+
     "leader involvement": [
-      "Town Hall Meeting",
-      "Open Door Policy",
+      "Tingkatkan keterlibatan pemimpin dalam kegiatan operasional.",
+      "Adakan pertemuan rutin dengan karyawan.",
+      "Berikan ruang bagi karyawan untuk menyampaikan masukan.",
     ],
-    "work environment": [
-      "Survey kepuasan kerja",
-      "Optimasi workspace",
-    ],
+
     "institutional resources": [
-      "Prioritaskan aset penting",
-      "Inventarisasi rutin",
+      "Lengkapi legalitas usaha dan dokumen pendukung.",
+      "Manfaatkan program pelatihan atau bantuan pemerintah.",
+      "Perluas kerja sama dengan mitra bisnis dan komunitas usaha.",
     ],
-    "economics performance": [
-      "Audit biaya operasional",
-      "Dana darurat 3 bulan",
-    ],
+
     "operational stability": [
-      "Digitalisasi dokumen",
-      "Quality control ketat",
+      "Perbaiki pengelolaan bahan baku dan persediaan.",
+      "Tingkatkan standar operasional dan pengendalian kualitas.",
+      "Bangun hubungan jangka panjang dengan pelanggan.",
+    ],
+
+    "quality of workplace": [
+      "Tingkatkan kenyamanan dan keamanan lingkungan kerja.",
+      "Evaluasi beban kerja serta jam kerja karyawan.",
+      "Perbaiki fasilitas kerja yang mendukung produktivitas.",
+    ],
+
+    "economic performance": [
+      "Optimalkan strategi pemasaran dan penjualan.",
+      "Perbaiki pengelolaan arus kas dan biaya operasional.",
+      "Perluas jangkauan pasar dan pelanggan potensial.",
     ],
   };
 
   const getStatus = (score) => {
-    if (score >= 85) return "STRONG";
-    if (score >= 70) return "STABLE";
-    return "RISK";
+    if (score >= 80) return "SANGAT BAIK";
+    if (score >= 65) return "BAIK";
+    if (score >= 50) return "CUKUP";
+    return "PERLU PERHATIAN";
+  };
+
+  const getStatusColor = (score) => {
+    if (score >= 80)
+      return "bg-green-100 text-green-700";
+
+    if (score >= 65)
+      return "bg-blue-100 text-blue-700";
+
+    if (score >= 50)
+      return "bg-yellow-100 text-yellow-700";
+
+    return "bg-red-100 text-red-700";
   };
 
   return (
@@ -75,6 +97,7 @@ export default function Rekomendasi() {
             <h1 className="text-2xl font-bold text-blue-900">
               Ringkasan Wawasan Bisnis
             </h1>
+
             <p className="text-gray-500 mt-2">
               Berikut rekomendasi berdasarkan performa Anda
             </p>
@@ -93,33 +116,61 @@ export default function Rekomendasi() {
             const recs = rekomendasiMap[key] || [];
 
             return (
-              <div key={i} className="bg-white p-6 rounded-xl shadow border">
-
+              <div
+                key={i}
+                className="bg-white p-6 rounded-xl shadow border"
+              >
                 <div className="flex justify-between mb-2">
                   <h3 className="font-semibold text-blue-900">
                     {item.name}
                   </h3>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+
+                  <span
+                    className={`text-xs px-2 py-1 rounded ${getStatusColor(
+                      item.score
+                    )}`}
+                  >
                     {getStatus(item.score)}
                   </span>
                 </div>
 
                 <p className="text-sm text-gray-500 mb-3">
-                  Skor: {item.score}
+                  Skor: {item.score}/100
                 </p>
+
+                {item.score < 50 && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-100 rounded-lg text-xs text-red-700">
+                    Faktor ini menjadi prioritas utama untuk diperbaiki.
+                  </div>
+                )}
+
+                {item.score >= 50 && item.score < 65 && (
+                  <div className="mb-4 p-3 bg-yellow-50 border border-yellow-100 rounded-lg text-xs text-yellow-700">
+                    Faktor ini masih perlu ditingkatkan agar lebih optimal.
+                  </div>
+                )}
+
+                {item.score >= 65 && item.score < 80 && (
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-xs text-blue-700">
+                    Faktor ini sudah cukup baik namun masih dapat ditingkatkan.
+                  </div>
+                )}
+
+                {item.score >= 80 && (
+                  <div className="mb-4 p-3 bg-green-50 border border-green-100 rounded-lg text-xs text-green-700">
+                    Faktor ini sudah sangat baik dan perlu dipertahankan.
+                  </div>
+                )}
 
                 <ul className="text-sm space-y-2 text-gray-600">
                   {recs.map((r, idx) => (
                     <li key={idx}>✔ {r}</li>
                   ))}
                 </ul>
-
               </div>
             );
           })}
-
         </div>
-
       </div>
     </div>
   );

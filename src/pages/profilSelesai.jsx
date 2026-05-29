@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/NavbarDashboard";
 import { CheckCircle, Shield, Database, BarChart3 } from "lucide-react";
 
 export default function ProfilSelesai() {

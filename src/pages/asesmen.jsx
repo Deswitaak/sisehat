@@ -10,7 +10,7 @@ export default function Asesmen() {
   const userData = JSON.parse(localStorage.getItem("user"));
   
   const role = profileData?.role || "Pemilik";
-  const userId = userData?.id || 1; // Fallback ke ID 1 jika localStorage kosong agar backend tidak mendeteksi data null
+ const userId = userData?.id_user;// Fallback ke ID 1 jika localStorage kosong agar backend tidak mendeteksi data null
 
   // =========================================================
   // PERTANYAAN OWNER & KARYAWAN
