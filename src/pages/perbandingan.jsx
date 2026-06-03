@@ -212,6 +212,8 @@ console.log("FILTERED", filteredIndustry);
   };
 
   const options = {
+    responsive: true,
+    maintainAspectRatio: false,
 
     scales: {
       r: {
@@ -226,30 +228,30 @@ console.log("FILTERED", filteredIndustry);
   };
 
   return (
-    <div className="bg-[#f4f7fb] min-h-screen">
+    <div className="bg-[#f4f7fb] min-h-screen overflow-x-hidden">
 
       <NavbarDashboard />
 
-      <div className="px-4 md:px-8 lg:px-16 py-6 md:py-10">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-16 py-6 md:py-10">
 
         {/* HEADER */}
-        <h1 className="text-2xl md:text-3xl font-bold text-blue-900">
+        <h1 className="text-2xl md:text-3xl font-bold text-blue-900 leading-tight">
 
           Perbandingan Asesmen Bisnis
 
         </h1>
 
-        <p className="text-gray-500 mt-2">
+        <p className="text-gray-500 mt-2 text-sm sm:text-base leading-relaxed">
 
           Analisis performa bisnis Anda dibandingkan dengan standar industri
 
         </p>
 
         {/* TOP FILTER */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6">
 
           {/* ASESMEN */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm border">
+          <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border min-w-0">
 
             <p className="text-xs text-gray-400 mb-2">
 
@@ -277,7 +279,7 @@ console.log("FILTERED", filteredIndustry);
     );
 
   }}
-  className="w-full border p-2 rounded-lg"
+  className="w-full border p-3 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-900"
 >
 
               {assessmentHistory.map(
@@ -303,7 +305,7 @@ console.log("FILTERED", filteredIndustry);
           </div>
 
           {/* INDUSTRI */}
-          <div className="bg-white p-4 rounded-xl shadow">
+          <div className="bg-white p-5 sm:p-6 rounded-xl shadow min-w-0">
 
             <p className="text-xs text-gray-400 mb-2">
 
@@ -318,7 +320,7 @@ console.log("FILTERED", filteredIndustry);
                   e.target.value
                 )
               }
-            className="w-full border p-2 rounded-lg"
+            className="w-full border p-3 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-900"
             >
 
               {industryOptions.map(
@@ -343,10 +345,10 @@ console.log("FILTERED", filteredIndustry);
         </div>
 
         {/* GRID */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mt-6 sm:mt-8">
 
           {/* CHART */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow">
+          <div className="lg:col-span-2 bg-white p-5 sm:p-6 rounded-xl shadow min-w-0">
 
             <h3 className="font-semibold text-blue-900 mb-4">
 
@@ -354,11 +356,13 @@ console.log("FILTERED", filteredIndustry);
 
             </h3>
 
-            <Radar
-              data={chartData}
-              options={options}
-            />
-            <p className="text-sm text-gray-500 mt-4">
+            <div className="relative h-[300px] sm:h-[390px] lg:h-[450px] w-full">
+              <Radar
+                data={chartData}
+                options={options}
+              />
+            </div>
+            <p className="text-sm text-gray-500 mt-4 leading-relaxed">
 
   Membandingkan dengan{" "}
 
@@ -378,10 +382,10 @@ console.log("FILTERED", filteredIndustry);
           </div>
 
           {/* RIGHT */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 sm:gap-6 min-w-0">
 
             {/* INSIGHT */}
-            <div className="bg-blue-900 text-white p-6 rounded-xl">
+            <div className="bg-blue-900 text-white p-5 sm:p-6 rounded-xl">
 
               <h3 className="font-semibold mb-2">
 
@@ -409,7 +413,7 @@ console.log("FILTERED", filteredIndustry);
             </div>
 
             {/* SCORE */}
-            <div className="bg-white p-6 rounded-xl shadow">
+            <div className="bg-white p-5 sm:p-6 rounded-xl shadow">
 
               <p className="text-sm text-gray-400">
 
@@ -430,7 +434,7 @@ console.log("FILTERED", filteredIndustry);
         </div>
 
         {/* SUMMARY */}
-<div className="bg-white p-6 rounded-xl shadow">
+<div className="bg-white p-5 sm:p-6 rounded-xl shadow mt-4 sm:mt-6">
 
   <h3 className="font-semibold text-blue-900 mb-3">
 
@@ -472,9 +476,9 @@ console.log("FILTERED", filteredIndustry);
 </div>
 
         {/* TABLE */}
-        <div className="bg-white mt-8 rounded-xl shadow overflow-hidden">
+        <div className="bg-white mt-6 sm:mt-8 rounded-xl shadow overflow-hidden">
 
-          <div className="px-6 py-4 border-b flex justify-between">
+          <div className="px-5 sm:px-6 py-4 border-b flex flex-col sm:flex-row sm:justify-between gap-2">
 
             <h3 className="font-semibold text-blue-900">
 
@@ -484,107 +488,105 @@ console.log("FILTERED", filteredIndustry);
 
           </div>
 
-          <table className="w-full text-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[650px] text-sm">
 
-            <thead className="bg-gray-50 text-gray-400 text-xs">
+              <thead className="bg-gray-50 text-gray-400 text-xs">
 
-              <tr>
+                <tr>
 
-                <th className="p-4 text-left">
+                  <th className="p-4 text-left">
 
-                  Faktor
+                    Faktor
 
-                </th>
+                  </th>
 
-                <th>
+                  <th>
 
-                  Hasil Anda
+                    Hasil Anda
 
-                </th>
+                  </th>
 
-                <th>
+                  <th>
 
-                  Industri
+                    Industri
 
-                </th>
+                  </th>
 
-                <th>
+                  <th>
 
-                  Delta
+                    Delta
 
-                </th>
+                  </th>
 
-              </tr>
+                </tr>
 
-            </thead>
+              </thead>
 
-            <tbody>
+              <tbody>
 
-              {currentFactors.map(
-                (item, i) => {
+                {currentFactors.map(
+                  (item, i) => {
 
-                 const avg =
-  filteredIndustry.find(
-    (f) =>
-      f.name === item.name
-  )?.score || 0;
-                  const delta =
-                    item.score - avg;
+                   const avg =
+    filteredIndustry.find(
+      (f) =>
+        f.name === item.name
+    )?.score || 0;
+                    const delta =
+                      item.score - avg;
 
-                  return (
+                    return (
 
-                    <tr
-                      key={i}
-                      className="border-t text-center"
-                    >
-
-                      <td className="text-left p-4">
-
-                        {item.name}
-
-                      </td>
-
-                      <td>
-
-                        {item.score}
-
-                      </td>
-
-                      <td>
-
-                        {avg}
-
-                      </td>
-
-                      <td
-                        className={
-                          delta >= 0
-                            ? "text-green-600 font-semibold"
-                            : "text-red-500 font-semibold"
-                        }
+                      <tr
+                        key={i}
+                        className="border-t text-center"
                       >
 
-                        {delta >= 0
-                          ? "+"
-                          : ""}
+                        <td className="text-left p-4 font-medium">
 
-                        {delta}
+                          {item.name}
 
-                      </td>
+                        </td>
 
-                    </tr>
-                  );
-                }
-              )}
+                        <td>
 
-            </tbody>
+                          {item.score}
 
-          </table>
+                        </td>
+
+                        <td>
+
+                          {avg}
+
+                        </td>
+
+                        <td
+                          className={
+                            delta >= 0
+                              ? "text-green-600 font-semibold"
+                              : "text-red-500 font-semibold"
+                          }
+                        >
+
+                          {delta > 0 ? `+${delta.toFixed(2)}` : delta.toFixed(2)}
+
+                        </td>
+
+                      </tr>
+                    );
+                  }
+                )}
+
+              </tbody>
+
+            </table>
+          </div>
 
         </div>
 
         {/* BUTTON */}
-        <div className="flex justify-center mt-10">
+        <div className="flex justify-center mt-8 sm:mt-10">
 
           <button
             onClick={() =>
@@ -598,7 +600,7 @@ console.log("FILTERED", filteredIndustry);
                 }
               )
             }
-            className="bg-blue-900 text-white px-6 py-3 rounded-lg shadow"
+            className="bg-blue-900 text-white px-6 py-3 rounded-lg shadow w-full sm:w-auto"
           >
 
             Lihat Rekomendasi Perbaikan

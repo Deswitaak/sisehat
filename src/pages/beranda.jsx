@@ -4,10 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import rawData from "../data/raw_data.json";
 
-import {
-  Radar,
-  Bar
-} from "react-chartjs-2";
+import { Radar, Bar } from "react-chartjs-2";
 
 import {
   Chart as ChartJS,
@@ -18,7 +15,7 @@ import {
   Tooltip,
   CategoryScale,
   LinearScale,
-  BarElement
+  BarElement,
 } from "chart.js";
 
 ChartJS.register(
@@ -33,9 +30,7 @@ ChartJS.register(
 );
 
 export default function Beranda() {
-  const profileData = JSON.parse(
-  localStorage.getItem("profileData")
-);
+  const profileData = JSON.parse(localStorage.getItem("profileData"));
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
@@ -53,10 +48,7 @@ export default function Beranda() {
       });
     });
 
-    return (
-      total /
-      (rawData.length * keys.length)
-    ).toFixed(2);
+    return (total / (rawData.length * keys.length)).toFixed(2);
   };
 
   // 🔥 DATA DASHBOARD DARI JSON ASLI
@@ -65,84 +57,28 @@ export default function Beranda() {
       {
         code: "OV",
         value: Number(
-          average([
-            "OH1",
-            "OH2",
-            "OH3",
-            "OH4",
-            "OH5",
-            "OH6",
-            "OH7",
-            "OH8",
-            "OH9",
-          ])
+          average(["OH1", "OH2", "OH3", "OH4", "OH5", "OH6", "OH7", "OH8", "OH9"])
         ),
       },
-
       {
         code: "LI",
-        value: Number(
-          average([
-            "OH10",
-            "OH11",
-            "OH12",
-            "OH13",
-            "OH14",
-            "OH15",
-          ])
-        ),
+        value: Number(average(["OH10", "OH11", "OH12", "OH13", "OH14", "OH15"])),
       },
-
       {
         code: "IR",
-        value: Number(
-          average([
-            "OH16",
-            "OH17",
-            "OH18",
-            "OH19",
-            "OH20",
-            "OH21",
-          ])
-        ),
+        value: Number(average(["OH16", "OH17", "OH18", "OH19", "OH20", "OH21"])),
       },
-
       {
         code: "OS",
-        value: Number(
-          average([
-            "OH22",
-            "OH23",
-            "OH24",
-            "OH25",
-            "OH26",
-          ])
-        ),
+        value: Number(average(["OH22", "OH23", "OH24", "OH25", "OH26"])),
       },
-
       {
         code: "QW",
-        value: Number(
-          average([
-            "OH27",
-            "OH28",
-            "OH29",
-            "OH30",
-            "OH31",
-          ])
-        ),
+        value: Number(average(["OH27", "OH28", "OH29", "OH30", "OH31"])),
       },
-
       {
         code: "EP",
-        value: Number(
-          average([
-            "OH32",
-            "OH33",
-            "OH34",
-            "OH35",
-          ])
-        ),
+        value: Number(average(["OH32", "OH33", "OH34", "OH35"])),
       },
     ],
 
@@ -150,14 +86,10 @@ export default function Beranda() {
     distribution: [25, 49, 29, 44],
 
     // 🔥 TOP 3
-rankingTop: [...rawData]
-  .sort((a, b) => b.TOTAL - a.TOTAL)
-  .slice(0, 3),
+    rankingTop: [...rawData].sort((a, b) => b.TOTAL - a.TOTAL).slice(0, 3),
 
-// 🔥 BOTTOM 3
-rankingBottom: [...rawData]
-  .sort((a, b) => a.TOTAL - b.TOTAL)
-  .slice(0, 3),
+    // 🔥 BOTTOM 3
+    rankingBottom: [...rawData].sort((a, b) => a.TOTAL - b.TOTAL).slice(0, 3),
   };
 
   // 🔥 VALUES
@@ -172,7 +104,6 @@ rankingBottom: [...rawData]
 
   const variance =
     values.reduce((sum, v) => sum + Math.pow(v - avg, 2), 0) / values.length;
-
   const std = Math.sqrt(variance).toFixed(2);
 
   const highest = data.factors.find((f) => f.value === max);
@@ -188,7 +119,6 @@ rankingBottom: [...rawData]
   // 🔥 RADAR
   const radarData = {
     labels: data.factors.map((f) => f.code),
-
     datasets: [
       {
         data: values,
@@ -200,10 +130,28 @@ rankingBottom: [...rawData]
     ],
   };
 
+  const radarOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      r: {
+        beginAtZero: true,
+        suggestedMax: 5,
+        ticks: {
+          stepSize: 1,
+        },
+      },
+    },
+  };
+
   // 🔥 BAR
   const barData = {
     labels: ["1-2", "2-3", "3-4", "4-5"],
-
     datasets: [
       {
         data: data.distribution,
@@ -212,305 +160,295 @@ rankingBottom: [...rawData]
     ],
   };
 
+  const barOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+      },
+    },
+  };
 
-// 🔥 BUTTON
-const handleStart = () => {
+  // 🔥 BUTTON
+  const handleStart = () => {
+    const isComplete = localStorage.getItem("profileComplete");
 
-  const isComplete =
-    localStorage.getItem("profileComplete");
+    console.log("PROFILE COMPLETE:", isComplete);
 
-  console.log(
-    "PROFILE COMPLETE:",
-    isComplete
-  );
-
-  if (isComplete === "true") {
-
-    navigate("/asesmen");
-
-  } else {
-
-    setShowModal(true);
-
-  }
-};
+    if (isComplete === "true") {
+      navigate("/asesmen");
+    } else {
+      setShowModal(true);
+    }
+  };
 
   return (
-    <div className="bg-[#f4f7fb] min-h-screen">
-
+    <div className="min-h-screen bg-[#f4f7fb] overflow-x-hidden">
       <NavbarDashboard />
 
       {/* ================= MODAL ================= */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[9999]">
-
-          <div className="bg-white rounded-xl w-[420px] p-8 text-center shadow-xl">
-
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-[420px] rounded-xl bg-white p-6 text-center shadow-xl sm:p-8">
             <h2 className="text-lg font-semibold text-blue-900">
               Profil UMKM Belum Lengkap
             </h2>
 
-            <p className="text-gray-500 mt-3 text-sm">
+            <p className="mt-3 text-sm text-gray-500">
               Harap lengkapi profil sebelum memulai asesmen.
             </p>
 
             <button
               onClick={() => navigate("/profile")}
-              className="w-full mt-6 bg-blue-900 text-white py-3 rounded-lg"
+              className="mt-6 w-full rounded-lg bg-blue-900 py-3 text-white transition hover:bg-blue-950"
             >
               Lengkapi Profil →
             </button>
 
             <button
               onClick={() => setShowModal(false)}
-              className="text-gray-400 mt-4 text-sm"
+              className="mt-4 text-sm text-gray-400"
             >
               Nanti Saja
             </button>
-
           </div>
         </div>
       )}
 
       {/* ================= CONTENT ================= */}
-      <div className="px-4 md:px-8 lg:px-16 py-6 md:py-10">
-
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 md:py-10 lg:px-12 xl:px-16">
         {/* HEADER */}
-        <h1 className="text-2xl md:text-3xl font-bold">
-  Halo, {profileData?.nama || "Pengguna"}
-</h1>
+        <section>
+          <h1 className="break-words text-2xl font-bold text-gray-900 md:text-3xl">
+            Halo, {profileData?.nama || "Pengguna"}
+          </h1>
 
-        <p className="text-sm text-gray-400 mt-1">
-          Dataset {totalUMKM} Responden UMKM di Jakarta dan Jawa Barat
-        </p>
+          <p className="mt-1 text-sm text-gray-400">
+            Dataset {totalUMKM} Responden UMKM di Jakarta dan Jawa Barat
+          </p>
+        </section>
 
         {/* GRID */}
-        <div className="grid grid-cols-3 gap-6 mt-6">
-
+        <section className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-3 lg:gap-6">
           {/* RADAR */}
-          <div className="col-span-2 bg-white p-6 rounded-xl shadow">
-
-            <h3 className="font-semibold mb-4">
+          <div className="rounded-xl bg-white p-4 shadow sm:p-6 lg:col-span-2">
+            <h3 className="mb-4 font-semibold text-gray-900">
               Radar Chart 6 Faktor Strategis
             </h3>
 
-            <Radar data={radarData} />
-
+            <div className="h-[280px] w-full sm:h-[360px] lg:h-[430px]">
+              <Radar data={radarData} options={radarOptions} />
+            </div>
           </div>
 
           {/* SIDE */}
-          <div className="flex flex-col gap-4">
-
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:flex lg:flex-col">
             {/* SCORE */}
-            <div className="bg-[#163456] text-white p-6 rounded-xl">
-
+            <div className="rounded-xl bg-[#163456] p-5 text-white sm:p-6">
               <p>Skor Keseluruhan</p>
 
-              <h2 className="text-4xl font-bold">
+              <h2 className="mt-1 text-3xl font-bold sm:text-4xl">
                 {score}/100
               </h2>
 
-              <p className="text-green-300 text-sm mt-2">
+              <p className="mt-2 text-sm text-green-300">
                 +4.2% dari sebelumnya
               </p>
-
             </div>
 
             {/* INSIGHT */}
-            <div className="bg-white p-5 rounded-xl shadow text-sm">
-
-              Faktor tertinggi{" "}
-              <b>{highest.code}</b>{" "}
-              ({max.toFixed(2)}),
-              terendah{" "}
-              <b>{lowest.code}</b>{" "}
-              ({min.toFixed(2)})
-
+            <div className="rounded-xl bg-white p-5 text-sm leading-relaxed shadow">
+              Faktor tertinggi <b>{highest.code}</b> ({max.toFixed(2)}),
+              terendah <b>{lowest.code}</b> ({min.toFixed(2)})
             </div>
 
             {/* STAT */}
-            <div className="bg-white p-5 rounded-xl shadow text-sm space-y-1">
-
-              <p>Mean: {avg.toFixed(2)}</p>
-              <p>Min: {min.toFixed(2)}</p>
-              <p>Max: {max.toFixed(2)}</p>
-              <p>Std Dev: {std}</p>
-
+            <div className="rounded-xl bg-white p-5 text-sm shadow sm:col-span-2 lg:col-span-1">
+              <div className="grid grid-cols-2 gap-2 lg:grid-cols-1">
+                <p>Mean: {avg.toFixed(2)}</p>
+                <p>Min: {min.toFixed(2)}</p>
+                <p>Max: {max.toFixed(2)}</p>
+                <p>Std Dev: {std}</p>
+              </div>
             </div>
-
           </div>
-        </div>
+        </section>
 
         {/* SMALL BOX */}
-        <div className="grid grid-cols-4 gap-4 mt-6">
-
-          <div className="bg-white p-4 rounded-xl text-center shadow">
-
-            <p className="text-gray-400 text-sm">
-              Total Responden
-            </p>
-
-            <p className="text-xl font-bold">
-              {totalUMKM}
-            </p>
-
+        <section className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="rounded-xl bg-white p-4 text-center shadow">
+            <p className="text-sm text-gray-400">Total Responden</p>
+            <p className="text-xl font-bold">{totalUMKM}</p>
           </div>
 
-          <div className="bg-white p-4 rounded-xl text-center shadow">
-
-            <p className="text-gray-400 text-sm">
-              Rata-rata
-            </p>
-
-            <p className="text-xl font-bold">
-              {avg.toFixed(2)}
-            </p>
-
+          <div className="rounded-xl bg-white p-4 text-center shadow">
+            <p className="text-sm text-gray-400">Rata-rata</p>
+            <p className="text-xl font-bold">{avg.toFixed(2)}</p>
           </div>
 
-          <div className="bg-white p-4 rounded-xl text-center shadow">
-
-            <p className="text-gray-400 text-sm">
-              Tertinggi
-            </p>
-
-            <p className="text-xl font-bold">
-              {highest.code}
-            </p>
-
+          <div className="rounded-xl bg-white p-4 text-center shadow">
+            <p className="text-sm text-gray-400">Tertinggi</p>
+            <p className="text-xl font-bold">{highest.code}</p>
           </div>
 
-          <div className="bg-white p-4 rounded-xl text-center shadow">
-
-            <p className="text-gray-400 text-sm">
-              Terendah
-            </p>
-
-            <p className="text-xl font-bold">
-              {lowest.code}
-            </p>
-
+          <div className="rounded-xl bg-white p-4 text-center shadow">
+            <p className="text-sm text-gray-400">Terendah</p>
+            <p className="text-xl font-bold">{lowest.code}</p>
           </div>
+        </section>
 
-        </div>
-
-        {/* TABLE */}
-        <div className="bg-white mt-6 rounded-xl shadow p-6">
-
-          <h3 className="font-semibold mb-4">
+        {/* RINCIAN FAKTOR */}
+        <section className="mt-6 rounded-xl bg-white p-4 shadow sm:p-6">
+          <h3 className="mb-4 font-semibold text-gray-900">
             Rincian Faktor
           </h3>
 
-          <table className="w-full text-sm">
+          {/* MOBILE CARD - TIDAK PERLU SWIPE */}
+          <div className="grid grid-cols-1 gap-3 md:hidden">
+            {data.factors.map((f, i) => {
+              const s = getStatus(f.value);
+              const skor = (f.value * 20).toFixed(1);
 
-            <thead className="border-b text-gray-400">
-              <tr>
-                <th>Faktor</th>
-                <th>Status</th>
-                <th>Skor</th>
-              </tr>
-            </thead>
+              return (
+                <div
+                  key={i}
+                  className="rounded-xl border bg-[#f8fafc] p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs text-gray-400">Faktor</p>
+                      <p className="mt-1 text-lg font-bold text-blue-900">
+                        {f.code}
+                      </p>
+                    </div>
 
-            <tbody>
+                    <span
+                      className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${s[1]}`}
+                    >
+                      {s[0]}
+                    </span>
+                  </div>
 
-              {data.factors.map((f, i) => {
-
-                const s = getStatus(f.value);
-
-                return (
-                  <tr
-                    key={i}
-                    className="border-b text-center"
-                  >
-
-                    <td className="text-left py-3">
-                      {f.code}
-                    </td>
-
-                    <td>
-                      <span
-                        className={`px-2 py-1 rounded ${s[1]}`}
-                      >
-                        {s[0]}
+                  <div className="mt-4">
+                    <div className="mb-2 flex items-center justify-between text-sm">
+                      <span className="text-gray-500">Skor</span>
+                      <span className="font-semibold text-gray-800">
+                        {skor}/100
                       </span>
-                    </td>
+                    </div>
 
-                    <td>
-                      {(f.value * 20).toFixed(1)}
-                    </td>
+                    <div className="h-2 w-full rounded-full bg-gray-200">
+                      <div
+                        className="h-2 rounded-full bg-blue-900"
+                        style={{ width: `${skor}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
 
-                  </tr>
-                );
-              })}
+          {/* DESKTOP TABLE */}
+          <div className="hidden md:block">
+            <table className="w-full text-sm">
+              <thead className="border-b text-gray-400">
+                <tr>
+                  <th className="py-2 text-left font-medium">Faktor</th>
+                  <th className="py-2 text-center font-medium">Status</th>
+                  <th className="py-2 text-center font-medium">Skor</th>
+                </tr>
+              </thead>
 
-            </tbody>
+              <tbody>
+                {data.factors.map((f, i) => {
+                  const s = getStatus(f.value);
 
-          </table>
+                  return (
+                    <tr
+                      key={i}
+                      className="border-b text-center last:border-b-0"
+                    >
+                      <td className="py-3 text-left font-medium text-gray-800">
+                        {f.code}
+                      </td>
 
-        </div>
+                      <td className="py-3">
+                        <span
+                          className={`inline-flex whitespace-nowrap rounded px-2 py-1 ${s[1]}`}
+                        >
+                          {s[0]}
+                        </span>
+                      </td>
+
+                      <td className="py-3">{(f.value * 20).toFixed(1)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
 
         {/* BOTTOM */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-
+        <section className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:gap-6">
           {/* BAR */}
-          <div className="bg-white p-6 rounded-xl shadow">
-
-            <h3 className="font-semibold mb-4">
+          <div className="rounded-xl bg-white p-4 shadow sm:p-6">
+            <h3 className="mb-4 font-semibold text-gray-900">
               Distribusi Nilai
             </h3>
 
-            <Bar data={barData} />
-
+            <div className="h-[260px] w-full sm:h-[320px]">
+              <Bar data={barData} options={barOptions} />
+            </div>
           </div>
 
           {/* RANK */}
-          <div className="bg-white p-6 rounded-xl shadow">
-
-            <h3 className="font-semibold mb-2">
-              Top 3
-            </h3>
+          <div className="rounded-xl bg-white p-4 shadow sm:p-6">
+            <h3 className="mb-2 font-semibold text-gray-900">Top 3</h3>
 
             {data.rankingTop.map((r, i) => (
               <div
                 key={i}
-                className="flex justify-between py-2 border-b"
+                className="flex items-center justify-between gap-4 border-b py-2 text-sm sm:text-base"
               >
-                <span>🥇 UMKM {r.ID}</span>
-                <b>{r.TOTAL}</b>
+                <span className="truncate">🥇 UMKM {r.ID}</span>
+                <b className="shrink-0">{r.TOTAL}</b>
               </div>
             ))}
 
-            <h3 className="font-semibold mt-4 mb-2">
+            <h3 className="mb-2 mt-4 font-semibold text-gray-900">
               Bottom 3
             </h3>
 
             {data.rankingBottom.map((r, i) => (
               <div
                 key={i}
-                className="flex justify-between py-2 border-b"
+                className="flex items-center justify-between gap-4 border-b py-2 text-sm sm:text-base"
               >
-                <span>⚠️ UMKM {r.ID}</span>
-                <b>{r.TOTAL}</b>
+                <span className="truncate">⚠️ UMKM {r.ID}</span>
+                <b className="shrink-0">{r.TOTAL}</b>
               </div>
             ))}
-
           </div>
-
-        </div>
+        </section>
 
         {/* BUTTON */}
-        <div className="text-center mt-10">
-
+        <div className="mt-10 text-center">
           <button
             onClick={handleStart}
-            className="bg-blue-900 text-white px-6 py-3 rounded-lg"
+            className="w-full rounded-lg bg-blue-900 px-6 py-3 text-white transition hover:bg-blue-950 sm:w-auto"
           >
             Mulai Asesmen Baru
           </button>
-
         </div>
-
-      </div>
+      </main>
     </div>
   );
 }

@@ -8,9 +8,9 @@ export default function Asesmen() {
   // Ambil data profil dan user dari localStorage
   const profileData = JSON.parse(localStorage.getItem("profileData"));
   const userData = JSON.parse(localStorage.getItem("user"));
-  
+
   const role = profileData?.role || "Pemilik";
- const userId = userData?.id_user;// Fallback ke ID 1 jika localStorage kosong agar backend tidak mendeteksi data null
+  const userId = userData?.id_user;// Fallback ke ID 1 jika localStorage kosong agar backend tidak mendeteksi data null
 
   // =========================================================
   // PERTANYAAN OWNER & KARYAWAN
@@ -179,92 +179,103 @@ export default function Asesmen() {
   };
 
   return (
-    <div className="bg-[#f4f7fb] min-h-screen flex flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-hidden bg-[#f4f7fb]">
       <NavbarDashboard />
 
-      <div className="px-4 md:px-8 lg:px-16 py-6 md:py-10 flex-1">
+      <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 md:px-8 md:py-10 lg:px-12 xl:px-16">
         {/* HEADER */}
-        <div>
-          <h1 className="text-2xl font-bold text-blue-900">Asesmen Profil Organisasi</h1>
-          <p className="text-gray-500 mt-2">Lengkapi asesmen berdasarkan role Anda.</p>
-        </div>
+        <section>
+          <h1 className="break-words text-2xl font-bold text-blue-900 md:text-3xl">
+            Asesmen Profil Organisasi
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-gray-500 sm:text-base">
+            Lengkapi asesmen berdasarkan role Anda.
+          </p>
+        </section>
 
         {/* ROLE INFO */}
-        <div className={`mt-6 p-4 rounded-xl text-sm ${role === "Pemilik" ? "bg-blue-50 text-blue-800" : "bg-green-50 text-green-800"}`}>
+        <section className={`mt-6 rounded-xl p-4 text-sm leading-relaxed ${role === "Pemilik" ? "bg-blue-50 text-blue-800" : "bg-green-50 text-green-800"}`}>
           {role === "Pemilik" ? (
             <>Anda mengisi sebagai <b>Pemilik Usaha</b> (Operasional, Legal, Finansial).</>
           ) : (
             <>Anda mengisi sebagai <b>Karyawan</b> (Lingkungan kerja, Kepemimpinan).</>
           )}
-        </div>
+        </section>
 
         {/* PROGRESS BAR */}
-        <div className="bg-white p-6 rounded-xl mt-6 shadow-sm">
-          <div className="flex justify-between text-sm text-gray-500 mb-2">
+        <section className="mt-6 rounded-xl bg-white p-4 shadow-sm sm:p-6">
+          <div className="mb-2 flex justify-between gap-4 text-sm text-gray-500">
             <span>Progress</span>
             <span>{answered}/{totalQuestions}</span>
           </div>
-          <div className="w-full bg-gray-200 h-2 rounded-full">
-            <div className="bg-blue-900 h-2 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+          <div className="h-2 w-full rounded-full bg-gray-200">
+            <div className="h-2 rounded-full bg-blue-900 transition-all duration-500" style={{ width: `${progress}%` }} />
           </div>
-        </div>
+        </section>
 
         {/* QUESTIONS CARD */}
-        <div className="bg-white rounded-xl mt-8 shadow-sm overflow-hidden">
-          <div className="bg-blue-900 text-white px-6 py-4 font-semibold">
+        <section className="mt-8 overflow-hidden rounded-xl bg-white shadow-sm">
+          <div className="bg-blue-900 px-4 py-4 font-semibold text-white sm:px-6">
             {step + 1}. {current.title}
           </div>
 
-          <div className="p-6 space-y-8">
+          <div className="space-y-6 p-4 sm:space-y-8 sm:p-6">
             {current.questions.map((q, i) => (
-              <div key={i}>
-                <p className="text-sm text-blue-900 mb-3 font-medium">{q}</p>
-                <div className="flex justify-between items-center text-xs text-gray-400">
-                  <span>{current.scale.length === 3 ? "TIDAK" : "SANGAT TIDAK SETUJU"}</span>
-                  <div className="flex gap-3">
+              <div key={i} className="rounded-xl border border-gray-100 p-4 sm:border-0 sm:p-0">
+                <p className="mb-4 text-sm font-medium leading-relaxed text-blue-900 sm:mb-3">{q}</p>
+
+                <div className="flex flex-col gap-3 text-xs text-gray-400 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide sm:w-28">
+                    {current.scale.length === 3 ? "TIDAK" : "SANGAT TIDAK SETUJU"}
+                  </span>
+
+                  <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-3">
                     {current.scale.map((num) => (
                       <button
                         key={num}
                         onClick={() => handleSelect(i, num)}
-                        className={`w-10 h-10 border rounded-md transition font-bold ${
+                        className={`h-11 w-full rounded-md border font-bold transition sm:h-10 sm:w-10 ${
                           answers[`${step}-${i}`] === num
-                            ? "bg-blue-900 text-white border-blue-900"
-                            : "hover:bg-gray-100 bg-white"
+                            ? "border-blue-900 bg-blue-900 text-white"
+                            : "bg-white hover:bg-gray-100"
                         }`}
                       >
                         {num}
                       </button>
                     ))}
                   </div>
-                  <span>{current.scale.length === 3 ? "YA" : "SANGAT SETUJU"}</span>
+
+                  <span className="shrink-0 text-[11px] font-medium uppercase tracking-wide sm:w-28 sm:text-right">
+                    {current.scale.length === 3 ? "YA" : "SANGAT SETUJU"}
+                  </span>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* NAVIGATION BUTTONS */}
-        <div className="flex justify-center gap-6 mt-10">
+        <div className="mt-8 flex flex-col-reverse gap-3 sm:mt-10 sm:flex-row sm:justify-center sm:gap-6">
           <button
             disabled={step === 0}
             onClick={() => setStep(step - 1)}
-            className="px-6 py-3 border rounded-lg text-gray-600 disabled:opacity-30 bg-white"
+            className="w-full rounded-lg border bg-white px-6 py-3 text-gray-600 transition hover:bg-gray-50 disabled:opacity-30 sm:w-auto"
           >
             Sebelumnya
           </button>
           <button
             onClick={handleNext}
             disabled={current.questions.some((_, i) => !answers[`${step}-${i}`])}
-            className={`px-8 py-3 rounded-lg font-bold text-white transition-all ${
-              current.questions.some((_, i) => !answers[`${step}-${i}`]) 
-              ? "bg-gray-400 cursor-not-allowed" 
-              : "bg-blue-900 hover:bg-blue-800 shadow-md"
+            className={`w-full rounded-lg px-8 py-3 font-bold text-white transition-all sm:w-auto ${
+              current.questions.some((_, i) => !answers[`${step}-${i}`])
+              ? "cursor-not-allowed bg-gray-400"
+              : "bg-blue-900 shadow-md hover:bg-blue-800"
             }`}
           >
             {step === sections.length - 1 ? "Simpan & Lihat Hasil" : "Selanjutnya"}
           </button>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

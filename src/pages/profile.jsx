@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-
+import NavbarDashboard from "../components/NavbarDashboard";
 import {
   User,
   Briefcase,
@@ -122,29 +121,29 @@ export default function Profil() {
 };
 
   return (
-    <div className="bg-[#f4f7fb] min-h-screen flex flex-col">
+    <div className="bg-[#f4f7fb] min-h-screen flex flex-col overflow-x-hidden">
 
-      <Navbar active="profileSelesai" />
+      <NavbarDashboard />
 
-      <div className="px-4 md:px-8 lg:px-16 py-6 md:py-10 flex-1">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-16 py-6 md:py-10 flex-1 w-full">
 
         {/* TITLE */}
-        <h1 className="text-2xl font-bold text-blue-900">
+        <h1 className="text-2xl md:text-3xl font-bold text-blue-900 leading-tight">
           Lengkapi Profil Usaha
         </h1>
 
-        <p className="text-gray-500 mt-2">
+        <p className="text-gray-500 mt-2 text-sm sm:text-base leading-relaxed max-w-3xl">
           Informasi ini akan membantu kami
           menyesuaikan analisis kesehatan usaha Anda.
         </p>
 
         {/* CARD */}
-        <div className="bg-white rounded-xl border mt-8 shadow-sm">
+        <div className="bg-white rounded-xl border mt-6 sm:mt-8 shadow-sm overflow-hidden">
 
           {/* HEADER */}
-          <div className="flex items-center gap-4 p-6 border-b">
+          <div className="flex items-start sm:items-center gap-4 p-5 sm:p-6 border-b">
 
-            <div className="bg-blue-100 p-3 rounded-lg">
+            <div className="bg-blue-100 p-3 rounded-lg shrink-0">
 
               <Briefcase
                 className="text-blue-900"
@@ -153,13 +152,13 @@ export default function Profil() {
 
             </div>
 
-            <div>
+            <div className="min-w-0">
 
               <h2 className="font-semibold text-blue-900">
                 Detail Identitas Usaha
               </h2>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 leading-relaxed">
                 Pastikan data yang dimasukkan
                 adalah data terbaru.
               </p>
@@ -169,20 +168,20 @@ export default function Profil() {
           </div>
 
           {/* FORM */}
-          <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
 
             {/* NAMA USAHA */}
-            <div>
+            <div className="min-w-0">
 
               <label className="text-sm font-medium">
                 Nama Usaha
               </label>
 
-              <div className="flex items-center border rounded-lg px-3 mt-1 bg-gray-50">
+              <div className="flex items-center border rounded-lg px-3 mt-1 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-900">
 
                 <User
                   size={16}
-                  className="text-gray-400"
+                  className="text-gray-400 shrink-0"
                 />
 
                 <input
@@ -190,7 +189,7 @@ export default function Profil() {
                   name="namaUsaha"
                   value={formData.namaUsaha}
                   onChange={handleChange}
-                  className="w-full p-2 ml-2 outline-none bg-transparent"
+                  className="w-full p-2 ml-2 outline-none bg-transparent min-w-0"
                   placeholder="Toko Anda"
                 />
 
@@ -199,7 +198,7 @@ export default function Profil() {
             </div>
 
             {/* JENIS USAHA */}
-            <div>
+            <div className="min-w-0">
 
               <label className="text-sm font-medium">
                 Jenis Usaha
@@ -210,14 +209,14 @@ export default function Profil() {
                 name="jenisUsaha"
                 value={formData.jenisUsaha}
                 onChange={handleChange}
-                className="w-full p-2 mt-1 border rounded-lg bg-gray-50"
+                className="w-full p-2 mt-1 border rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900"
                 placeholder="Contoh: Coffee Shop"
               />
 
             </div>
 
             {/* KATEGORI UMKM */}
-            <div>
+            <div className="min-w-0">
 
               <label className="text-sm font-medium">
                 Kategori UMKM
@@ -227,7 +226,7 @@ export default function Profil() {
                 name="kategori"
                 value={formData.kategori}
                 onChange={handleChange}
-                className="w-full p-2 mt-1 border rounded-lg bg-gray-50"
+                className="w-full p-2 mt-1 border rounded-lg bg-gray-50 outline-none focus:ring-2 focus:ring-blue-900"
               >
 
                 <option value="">
@@ -267,17 +266,17 @@ export default function Profil() {
             </div>
 
             {/* LAMA USAHA */}
-            <div>
+            <div className="min-w-0">
 
               <label className="text-sm font-medium">
                 Lama Usaha (Tahun)
               </label>
 
-              <div className="flex items-center border rounded-lg px-3 mt-1 bg-gray-50">
+              <div className="flex items-center border rounded-lg px-3 mt-1 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-900">
 
                 <Calendar
                   size={16}
-                  className="text-gray-400"
+                  className="text-gray-400 shrink-0"
                 />
 
                 <input
@@ -285,7 +284,7 @@ export default function Profil() {
                   name="lamaUsaha"
                   value={formData.lamaUsaha}
                   onChange={handleChange}
-                  className="w-full p-2 ml-2 outline-none bg-transparent"
+                  className="w-full p-2 ml-2 outline-none bg-transparent min-w-0"
                   placeholder="5"
                 />
 
@@ -294,17 +293,17 @@ export default function Profil() {
             </div>
 
             {/* USIA */}
-            <div>
+            <div className="min-w-0">
 
               <label className="text-sm font-medium">
                 Usia
               </label>
 
-              <div className="flex items-center border rounded-lg px-3 mt-1 bg-gray-50">
+              <div className="flex items-center border rounded-lg px-3 mt-1 bg-gray-50 focus-within:ring-2 focus-within:ring-blue-900">
 
                 <Users
                   size={16}
-                  className="text-gray-400"
+                  className="text-gray-400 shrink-0"
                 />
 
                 <input
@@ -312,7 +311,7 @@ export default function Profil() {
                   name="usia"
                   value={formData.usia}
                   onChange={handleChange}
-                  className="w-full p-2 ml-2 outline-none bg-transparent"
+                  className="w-full p-2 ml-2 outline-none bg-transparent min-w-0"
                   placeholder="30"
                 />
 
@@ -321,20 +320,20 @@ export default function Profil() {
             </div>
 
             {/* ROLE */}
-            <div>
+            <div className="min-w-0">
 
               <label className="text-sm font-medium">
                 Posisi
               </label>
 
-              <div className="flex gap-4 mt-3">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-3">
 
                 <button
                   type="button"
                   onClick={() =>
                     setRole("Pemilik")
                   }
-                  className={`px-5 py-2 rounded-lg border transition ${
+                  className={`px-5 py-2 rounded-lg border transition w-full sm:w-auto ${
                     role === "Pemilik"
                       ? "bg-blue-900 text-white border-blue-900"
                       : "bg-white"
@@ -348,7 +347,7 @@ export default function Profil() {
                   onClick={() =>
                     setRole("Karyawan")
                   }
-                  className={`px-5 py-2 rounded-lg border transition ${
+                  className={`px-5 py-2 rounded-lg border transition w-full sm:w-auto ${
                     role === "Karyawan"
                       ? "bg-green-600 text-white border-green-600"
                       : "bg-white"
@@ -364,7 +363,7 @@ export default function Profil() {
 
                 {role === "Pemilik" && (
 
-                  <div className="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg">
+                  <div className="bg-blue-50 text-blue-800 text-xs p-3 rounded-lg leading-relaxed">
 
                     Anda akan mengisi asesmen terkait:
                     <b>
@@ -381,7 +380,7 @@ export default function Profil() {
 
                 {role === "Karyawan" && (
 
-                  <div className="bg-green-50 text-green-800 text-xs p-3 rounded-lg">
+                  <div className="bg-green-50 text-green-800 text-xs p-3 rounded-lg leading-relaxed">
 
                     Anda akan mengisi asesmen terkait:
                     <b>
@@ -400,13 +399,13 @@ export default function Profil() {
             </div>
 
             {/* GENDER */}
-            <div>
+            <div className="min-w-0">
 
               <label className="text-sm font-medium">
                 Jenis Kelamin
               </label>
 
-              <div className="flex gap-4 mt-2">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2">
 
                 <label className="flex items-center gap-2">
 
@@ -447,26 +446,26 @@ export default function Profil() {
           </div>
 
           {/* FOOTER */}
-          <div className="flex justify-between items-center border-t p-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 border-t p-5 sm:p-6">
 
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-gray-400 leading-relaxed">
               🔒 Data Anda tersimpan dengan aman.
             </p>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col-reverse sm:flex-row sm:items-center gap-3 sm:gap-4 w-full sm:w-auto">
 
               <button
                 onClick={() =>
                   navigate("/beranda")
                 }
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 w-full sm:w-auto py-2"
               >
                 Batal
               </button>
 
               <button
                 onClick={handleSubmit}
-                className="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition"
+                className="bg-blue-900 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition w-full sm:w-auto"
               >
                 Simpan & Lanjut
               </button>

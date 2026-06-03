@@ -24,10 +24,6 @@ export default function Features() {
             <p className="text-gray-500 text-sm mt-2">
               Visualisasikan tren pasar dan perilaku konsumen dengan dashboard yang sangat interaktif dan mendalam.
             </p>
-
-            <p className="text-blue-600 text-sm mt-4 cursor-pointer">
-              Pelajari Selengkapnya →
-            </p>
           </div>
 
           {/* ICON KANAN */}
@@ -67,29 +63,29 @@ export default function Features() {
         </div>
 
         {/* ===== CARD 4 (KANAN BAWAH - IMAGE) ===== */}
-       <div className="h-[140px] relative rounded-xl overflow-hidden group hover:shadow-lg transition">
+        <div className="h-[140px] relative rounded-xl overflow-hidden group hover:shadow-lg transition">
 
-  {/* IMAGE */}
-  <img
-    src={imageCustom}
-    className="w-full h-full object-cover"
-  />
+          {/* IMAGE */}
+          <img
+            src={imageCustom}
+            className="w-full h-full object-cover"
+          />
 
-  {/* GRADIENT OVERLAY (lebih halus) */}
-  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
+          {/* GRADIENT OVERLAY */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
 
-  {/* TEXT */}
-  <div className="absolute bottom-5 left-5 text-white">
-    <h3 className="font-semibold text-lg">
-      Keamanan Data Enterprise
-    </h3>
+          {/* TEXT */}
+          <div className="absolute bottom-5 left-5 text-white">
+            <h3 className="font-semibold text-lg">
+              Keamanan Data Enterprise
+            </h3>
 
-    <p className="text-sm mt-1 max-w-xs text-gray-200">
-      Enkripsi tingkat militer untuk memastikan seluruh aset informasi bisnis Anda tetap terlindungi.
-    </p>
-  </div>
+            <p className="text-sm mt-1 max-w-xs text-gray-200">
+              Enkripsi tingkat militer untuk memastikan seluruh aset informasi bisnis Anda tetap terlindungi.
+            </p>
+          </div>
 
-</div>
+        </div>
       </div>
     </section>
   );

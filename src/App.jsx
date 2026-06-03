@@ -14,7 +14,9 @@ import Perbandingan from "./pages/perbandingan";
 import Rekomendasi from "./pages/rekomendasi";
 import Eksplorasi from "./pages/eksplorasi";
 import DetailUMKM from "./pages/detailumkm";
-
+import Privasi from "./pages/Privasi";
+import SyaratKetentuan from "./pages/SyaratKetentuan";
+import Kontak from "./pages/Kontak";
 
 function App() {
   return (
@@ -39,7 +41,9 @@ function App() {
          <Route path="/detailumkm" element={<DetailUMKM />}/>
         <Route path="/settings" element={<Settings />} />
         <Route path="/profil" element={<EditProfile />} />
-      
+      <Route path="/privasi" element={<Privasi />} />
+<Route path="/syarat-ketentuan" element={<SyaratKetentuan />} />
+<Route path="/kontak" element={<Kontak />} />
 
       </Routes>
     </BrowserRouter>

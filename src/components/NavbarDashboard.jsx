@@ -1,39 +1,35 @@
-import {
-  Link,
-  useLocation,
-  useNavigate
-} from "react-router-dom";
-
-import {
-  useState,
-  useRef,
-  useEffect
-} from "react";
-
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
 import LogoutModal from "./LogoutModal";
 
 export default function NavbarDashboard() {
-
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [mobileMenu, setMobileMenu] =
-  useState(false);
-
+  const [mobileMenu, setMobileMenu] = useState(false);
   const [open, setOpen] = useState(false);
   const [showLogout, setShowLogout] = useState(false);
 
+  const [gateModal, setGateModal] = useState({
+    open: false,
+    title: "",
+    message: "",
+    primaryText: "",
+    primaryPath: "",
+  });
+
   const dropdownRef = useRef();
 
-  // 🔥 AMBIL DATA USER
-  const profileData = JSON.parse(
-    localStorage.getItem("profileData")
-  );
+  const safeParse = (value) => {
+    try {
+      return value ? JSON.parse(value) : null;
+    } catch {
+      return null;
+    }
+  };
 
-  // 🔥 USER REGISTER
-  const userData = JSON.parse(
-    localStorage.getItem("user")
-  );
+  const profileData = safeParse(localStorage.getItem("profileData"));
+  const userData = safeParse(localStorage.getItem("user"));
 
   const menu = [
     { name: "Beranda", path: "/beranda" },
@@ -43,262 +39,451 @@ export default function NavbarDashboard() {
     { name: "Eksplorasi", path: "/eksplorasi" },
   ];
 
-  // 🔥 CLOSE DROPDOWN
+  const displayName = profileData?.nama || userData?.name || "Pengguna";
+  const displayEmail = userData?.email || "user@email.com";
+  const avatarLetter = (displayName || "U").charAt(0).toUpperCase();
+
+  const isProfileComplete = () => {
+    const profileComplete = localStorage.getItem("profileComplete");
+    const currentProfileData = safeParse(localStorage.getItem("profileData"));
+
+    if (profileComplete === "true") {
+      return true;
+    }
+
+    const hasCompleteProfile =
+      (currentProfileData?.namaUsaha || currentProfileData?.nama_usaha) &&
+      (currentProfileData?.jenisUsaha || currentProfileData?.jenis_usaha) &&
+      currentProfileData?.kategori &&
+      (currentProfileData?.lamaUsaha || currentProfileData?.lama_usaha) &&
+      (currentProfileData?.usia || currentProfileData?.usia_pemilik) &&
+      (currentProfileData?.role || currentProfileData?.posisi);
+
+    return Boolean(hasCompleteProfile);
+  };
+
+  const isAssessmentComplete = () => {
+    const assessmentComplete = localStorage.getItem("assessmentComplete");
+    const hasilAnalisis = safeParse(localStorage.getItem("hasilAnalisis"));
+
+    if (assessmentComplete === "true") {
+      return true;
+    }
+
+    if (hasilAnalisis?.factors?.length > 0) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const showGatePopup = ({
+    title,
+    message,
+    primaryText,
+    primaryPath,
+  }) => {
+    setGateModal({
+      open: true,
+      title,
+      message,
+      primaryText,
+      primaryPath,
+    });
+  };
+
+  const closeGatePopup = () => {
+    setGateModal({
+      open: false,
+      title: "",
+      message: "",
+      primaryText: "",
+      primaryPath: "",
+    });
+  };
+
+  const handleMenuClick = (item) => {
+    const profileReady = isProfileComplete();
+    const assessmentReady = isAssessmentComplete();
+
+    if (item.path === "/asesmen") {
+      if (!profileReady) {
+        showGatePopup({
+          title: "Profil UMKM Belum Lengkap",
+          message:
+            "Anda belum mengisi profil. Jika ingin melakukan asesmen, silakan lengkapi profil usaha terlebih dahulu.",
+          primaryText: "Lengkapi Profil",
+          primaryPath: "/profil",
+        });
+        return;
+      }
+
+      navigate("/asesmen");
+      return;
+    }
+
+    if (item.path === "/perbandingan") {
+      if (!profileReady && !assessmentReady) {
+        showGatePopup({
+          title: "Profil dan Asesmen Belum Lengkap",
+          message:
+            "Anda belum mengisi profil dan belum melakukan asesmen. Lengkapi profil terlebih dahulu, lalu isi asesmen agar bisa membuka perbandingan.",
+          primaryText: "Lengkapi Profil",
+          primaryPath: "/profil",
+        });
+        return;
+      }
+
+      if (!profileReady) {
+        showGatePopup({
+          title: "Profil UMKM Belum Lengkap",
+          message:
+            "Anda belum mengisi profil. Jika ingin membuka perbandingan, silakan lengkapi profil usaha terlebih dahulu.",
+          primaryText: "Lengkapi Profil",
+          primaryPath: "/profil",
+        });
+        return;
+      }
+
+      if (!assessmentReady) {
+        showGatePopup({
+          title: "Asesmen Belum Diisi",
+          message:
+            "Anda belum mengisi asesmen. Silakan isi asesmen terlebih dahulu agar data perbandingan bisa ditampilkan.",
+          primaryText: "Ke Asesmen",
+          primaryPath: "/asesmen",
+        });
+        return;
+      }
+
+      navigate("/perbandingan");
+      return;
+    }
+
+    if (item.path === "/rekomendasi") {
+      if (!profileReady) {
+        showGatePopup({
+          title: "Profil UMKM Belum Lengkap",
+          message:
+            "Anda belum mengisi profil. Jika ingin melihat rekomendasi, silakan lengkapi profil usaha terlebih dahulu.",
+          primaryText: "Lengkapi Profil",
+          primaryPath: "/profil",
+        });
+        return;
+      }
+
+      if (!assessmentReady) {
+        showGatePopup({
+          title: "Asesmen Belum Diisi",
+          message:
+            "Rekomendasi belum bisa ditampilkan karena Anda belum mengisi asesmen. Silakan isi asesmen terlebih dahulu.",
+          primaryText: "Ke Asesmen",
+          primaryPath: "/asesmen",
+        });
+        return;
+      }
+
+      navigate("/rekomendasi");
+      return;
+    }
+
+    navigate(item.path);
+  };
+
   useEffect(() => {
-
     const handleClickOutside = (e) => {
-
-      if (
-        !dropdownRef.current?.contains(e.target)
-      ) {
+      if (!dropdownRef.current?.contains(e.target)) {
         setOpen(false);
       }
     };
 
-    document.addEventListener(
-      "mousedown",
-      handleClickOutside
-    );
+    document.addEventListener("mousedown", handleClickOutside);
 
-    return () =>
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
-
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (mobileMenu) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenu]);
 
   return (
     <>
-     <nav className="flex justify-between items-center px-4 md:px-12 py-4 md:py-5">
-
-        {/* LOGO */}
-        <h1
-  onClick={() => navigate("/beranda")}
-  className="font-bold text-xl text-blue-900 cursor-pointer"
->
-  SiSehat
-</h1>
-
-        {/* MENU */}
-        <div className="hidden md:flex gap-4 md:gap-8 text-sm">
-
-          {menu.map((item) => {
-
-            const isActive =
-              location.pathname.startsWith(item.path);
-
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`${
-                  isActive
-                    ? "text-blue-900 font-semibold"
-                    : "text-gray-500 hover:text-blue-900"
-                }`}
-              >
-                {item.name}
-              </Link>
-            );
-          })}
-
-        </div>
-
-        <div className="md:hidden">
-
-  <button
-    onClick={() =>
-      setMobileMenu(true)
-    }
-    className="text-3xl font-bold"
-  >
-    ☰
-  </button>
-
-</div>
-
-        {/* RIGHT */}
-        <div
-          className="flex items-center gap-4 relative"
-          ref={dropdownRef}
-        >
-
-          {/* ⚙️ */}
-          <button
-            onClick={() => setOpen(!open)}
-            className="text-xl hover:scale-110 transition"
+      <nav className="sticky top-0 z-40 w-full border-b bg-[#f4f7fb]/95 px-4 py-4 backdrop-blur sm:px-6 lg:px-12 lg:py-5">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4">
+          {/* LOGO */}
+          <h1
+            onClick={() => navigate("/beranda")}
+            className="shrink-0 cursor-pointer text-xl font-bold text-blue-900"
           >
-            ⚙️
-          </button>
+            SiSehat
+          </h1>
 
-          {/* USER */}
-          <div
-            onClick={() => navigate("/profil")}
-            className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-200 transition"
-          >
+          {/* MENU DESKTOP */}
+          <div className="hidden items-center gap-6 text-sm lg:flex xl:gap-8">
+            {menu.map((item) => {
+              const isActive = location.pathname.startsWith(item.path);
 
-            {/* NAMA */}
-            <span className="text-sm font-medium">
-
-              {profileData?.nama ||
-                userData?.name ||
-                "Pengguna"}
-
-            </span>
-
-            {/* FOTO JADI HURUF */}
-            <div className="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center text-xs font-semibold">
-
-              {(profileData?.nama ||
-                userData?.name ||
-                "U")
-                .charAt(0)
-                .toUpperCase()}
-
-            </div>
-
+              return (
+                <button
+                  key={item.name}
+                  type="button"
+                  onClick={() => handleMenuClick(item)}
+                  className={`whitespace-nowrap transition ${
+                    isActive
+                      ? "font-semibold text-blue-900"
+                      : "text-gray-500 hover:text-blue-900"
+                  }`}
+                >
+                  {item.name}
+                </button>
+              );
+            })}
           </div>
 
-          {/* DROPDOWN */}
-          {open && (
+          {/* RIGHT DESKTOP */}
+          <div
+            className="relative hidden items-center gap-4 lg:flex"
+            ref={dropdownRef}
+          >
+            <button
+              onClick={() => setOpen(!open)}
+              className="text-xl transition hover:scale-110"
+              type="button"
+            >
+              ⚙️
+            </button>
 
-            <div className="absolute right-0 top-14 w-64 bg-white rounded-2xl shadow-xl border p-4 z-50">
+            <div
+              onClick={() => navigate("/profil")}
+              className="flex max-w-[220px] cursor-pointer items-center gap-2 rounded-full bg-gray-100 px-3 py-1 transition hover:bg-gray-200"
+            >
+              <span className="truncate text-sm font-medium">
+                {displayName}
+              </span>
 
-              {/* ACCOUNT */}
-              <div className="mb-3">
-
-                <p className="text-xs text-gray-400">
-                  AKUN SAYA
-                </p>
-
-                <p className="text-sm font-semibold text-blue-900 mt-1">
-
-                  {profileData?.nama ||
-                    userData?.name ||
-                    "Pengguna"}
-
-                </p>
-
-                <p className="text-sm text-gray-500 mt-1">
-
-                  {userData?.email ||
-                    "user@email.com"}
-
-                </p>
-
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-900 text-xs font-semibold text-white">
+                {avatarLetter}
               </div>
-
-              <div className="border-t mb-2"></div>
-
-              {/* MENU */}
-              <div className="flex flex-col">
-
-                <button
-                  onClick={() => navigate("/profil")}
-                  className="px-3 py-2 rounded-lg hover:bg-gray-100 text-left"
-                >
-                  👤 Edit Profil
-                </button>
-
-                <button
-                  onClick={() => navigate("/settings")}
-                  className="px-3 py-2 rounded-lg hover:bg-gray-100 text-left"
-                >
-                  ⚙️ Settings
-                </button>
-
-                {/* LOGOUT */}
-                <button
-                  onClick={() => {
-                    setShowLogout(true);
-                    setOpen(false);
-                  }}
-                  className="px-3 py-2 rounded-lg hover:bg-red-50 text-left text-red-500"
-                >
-                  🚪 Keluar
-                </button>
-
-              </div>
-
             </div>
 
-          )}
+            {open && (
+              <div className="absolute right-0 top-14 z-50 w-64 rounded-2xl border bg-white p-4 shadow-xl">
+                <div className="mb-3">
+                  <p className="text-xs text-gray-400">AKUN SAYA</p>
 
-        </div>
-{mobileMenu && (
-  <div className="fixed inset-0 bg-black/40 z-50">
+                  <p className="mt-1 truncate text-sm font-semibold text-blue-900">
+                    {displayName}
+                  </p>
 
-    <div className="absolute right-0 top-0 h-full w-72 bg-white p-6 shadow-xl">
+                  <p className="mt-1 truncate text-sm text-gray-500">
+                    {displayEmail}
+                  </p>
+                </div>
 
-      <button
-        onClick={() =>
-          setMobileMenu(false)
-        }
-        className="text-2xl"
-      >
-        ✕
-      </button>
+                <div className="mb-2 border-t"></div>
 
-      <div className="mt-8 flex flex-col gap-5">
+                <div className="flex flex-col">
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/profil");
+                    }}
+                    className="rounded-lg px-3 py-2 text-left hover:bg-gray-100"
+                    type="button"
+                  >
+                    👤 Edit Profil
+                  </button>
 
-        {menu.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={() =>
-              setMobileMenu(false)
-            }
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      navigate("/settings");
+                    }}
+                    className="rounded-lg px-3 py-2 text-left hover:bg-gray-100"
+                    type="button"
+                  >
+                    ⚙️ Settings
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowLogout(true);
+                      setOpen(false);
+                    }}
+                    className="rounded-lg px-3 py-2 text-left text-red-500 hover:bg-red-50"
+                    type="button"
+                  >
+                    🚪 Keluar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* BUTTON MOBILE */}
+          <button
+            onClick={() => setMobileMenu(true)}
+            className="block rounded-lg px-2 py-1 text-3xl font-bold text-blue-900 lg:hidden"
+            type="button"
+            aria-label="Buka menu"
           >
-            {item.name}
-          </Link>
-        ))}
-
-      </div>
-
-      <div className="border-t mt-8 pt-4 flex flex-col gap-3">
-
-        <button
-          onClick={() => navigate("/profil")}
-          className="text-left"
-        >
-          👤 Edit Profil
-        </button>
-
-        <button
-          onClick={() => navigate("/settings")}
-          className="text-left"
-        >
-          ⚙️ Settings
-        </button>
-
-        <button
-          onClick={() =>
-            setShowLogout(true)
-          }
-          className="text-left text-red-500"
-        >
-          🚪 Keluar
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-)}
+            ☰
+          </button>
+        </div>
       </nav>
 
-      {/* MODAL */}
+      {/* MENU MOBILE */}
+      {mobileMenu && (
+        <div className="fixed inset-0 z-50 bg-black/40 lg:hidden">
+          <button
+            className="absolute inset-0 h-full w-full cursor-default"
+            onClick={() => setMobileMenu(false)}
+            type="button"
+            aria-label="Tutup menu"
+          ></button>
+
+          <div className="absolute right-0 top-0 flex h-full w-[82%] max-w-[320px] flex-col bg-white p-6 shadow-xl">
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-lg font-bold text-blue-900">SiSehat</h2>
+
+              <button
+                onClick={() => setMobileMenu(false)}
+                className="text-2xl"
+                type="button"
+                aria-label="Tutup menu"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-gray-100 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-900 text-sm font-semibold text-white">
+                  {avatarLetter}
+                </div>
+
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-blue-900">
+                    {displayName}
+                  </p>
+                  <p className="truncate text-xs text-gray-500">
+                    {displayEmail}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-col gap-2">
+              {menu.map((item) => {
+                const isActive = location.pathname.startsWith(item.path);
+
+                return (
+                  <button
+                    key={item.path}
+                    type="button"
+                    onClick={() => {
+                      setMobileMenu(false);
+                      handleMenuClick(item);
+                    }}
+                    className={`rounded-xl px-4 py-3 text-left text-sm transition ${
+                      isActive
+                        ? "bg-blue-50 font-semibold text-blue-900"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    {item.name}
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="mt-auto border-t pt-4">
+              <button
+                onClick={() => {
+                  setMobileMenu(false);
+                  navigate("/profil");
+                }}
+                className="w-full rounded-xl px-4 py-3 text-left text-sm hover:bg-gray-100"
+                type="button"
+              >
+                👤 Edit Profil
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenu(false);
+                  navigate("/settings");
+                }}
+                className="w-full rounded-xl px-4 py-3 text-left text-sm hover:bg-gray-100"
+                type="button"
+              >
+                ⚙️ Settings
+              </button>
+
+              <button
+                onClick={() => {
+                  setMobileMenu(false);
+                  setShowLogout(true);
+                }}
+                className="w-full rounded-xl px-4 py-3 text-left text-sm text-red-500 hover:bg-red-50"
+                type="button"
+              >
+                🚪 Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* POPUP BLOKIR NAVIGASI */}
+      {gateModal.open && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-[420px] rounded-xl bg-white p-6 text-center shadow-xl sm:p-8">
+            <h2 className="text-lg font-semibold text-blue-900">
+              {gateModal.title}
+            </h2>
+
+            <p className="mt-3 text-sm leading-relaxed text-gray-500">
+              {gateModal.message}
+            </p>
+
+            <button
+              onClick={() => {
+                const targetPath = gateModal.primaryPath;
+                closeGatePopup();
+                navigate(targetPath);
+              }}
+              className="mt-6 w-full rounded-lg bg-blue-900 py-3 text-white transition hover:bg-blue-950"
+              type="button"
+            >
+              {gateModal.primaryText}
+            </button>
+
+            <button
+              onClick={closeGatePopup}
+              className="mt-4 text-sm text-gray-400"
+              type="button"
+            >
+              Nanti Saja
+            </button>
+          </div>
+        </div>
+      )}
+
       <LogoutModal
         open={showLogout}
         onClose={() => setShowLogout(false)}
         onConfirm={() => {
-
           localStorage.clear();
-
           navigate("/");
-
         }}
       />
     </>
