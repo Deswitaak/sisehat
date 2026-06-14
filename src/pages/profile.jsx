@@ -27,7 +27,6 @@ export default function Profil() {
 
   // 🔥 HANDLE INPUT
   const handleChange = (e) => {
-
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -37,62 +36,74 @@ export default function Profil() {
   // 🔥 SUBMIT
   const handleSubmit = async () => {
 
-  if (
-    !formData.namaUsaha ||
-    !formData.jenisUsaha ||
-    !formData.kategori ||
-    !formData.lamaUsaha ||
-    !formData.usia
-  ) {
-    alert("Semua field wajib diisi");
-    return;
-  }
-
-  if (!role) {
-    alert("Pilih posisi terlebih dahulu");
-    return;
-  }
-
-  try {
-
-    const user = JSON.parse(localStorage.getItem("user"));
-
-    if (!user) {
-      alert("User tidak ditemukan, silakan login ulang");
+    if (
+      !formData.namaUsaha ||
+      !formData.jenisUsaha ||
+      !formData.kategori ||
+      !formData.lamaUsaha ||
+      !formData.usia
+    ) {
+      alert("Semua field wajib diisi");
       return;
     }
 
-    const response = await fetch(
-      "http://localhost/sisehat/api-sisehat/save_profile.php",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id_user: user.id_user,
-          nama_usaha: formData.namaUsaha,
-          kategori: formData.kategori,
-          jenis_usaha: formData.jenisUsaha,
-          lama_usaha: parseInt(formData.lamaUsaha),
-          usia_pemilik: parseInt(formData.usia),
-          posisi: role,
-          jenis_kelamin: formData.gender,
-        }),
+    if (!role) {
+      alert("Pilih posisi terlebih dahulu");
+      return;
+    }
+
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      if (!user) {
+        alert("User tidak ditemukan, silakan login ulang");
+        return;
       }
-    );
 
-    const result = await response.json();
-
-    if (result.status === "success") {
-
-      localStorage.setItem(
-        "profileComplete",
-        "true"
+      // 🔥 PERBAIKAN UTAMA: Menggunakan URL relatif agar langsung menembak database cloud InfinityFree
+      const response = await fetch(
+        "/api-sisehat/save_profile.php?v=final_siap_demo",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id_user: user.id_user,
+            nama_usaha: formData.namaUsaha,
+            kategori: formData.kategori,
+            jenis_usaha: formData.jenisUsaha,
+            lama_usaha: parseInt(formData.lamaUsaha),
+            usia_pemilik: parseInt(formData.usia),
+            posisi: role,
+            jenis_kelamin: formData.gender,
+          }),
+        }
       );
 
-      const oldData =
-        JSON.parse(localStorage.getItem("profileData")) || {};
+      if (!response.ok) {
+        throw new Error("HTTP status tidak oke.");
+      }
+
+      const responseText = await response.text();
+      let result = null;
+
+      try {
+        result = JSON.parse(responseText);
+      } catch (jsonError) {
+        throw new Error("Respons server bukan format JSON valid.");
+      }
+
+      // Pengecekan ketat status error dari database cloud
+      if (!result || result.status === "error") {
+        alert("Gagal Database: " + (result?.message || "Gagal menyimpan data"));
+        return;
+      }
+
+      // Jika sukses riil masuk database
+      localStorage.setItem("profileComplete", "true");
+
+      const oldData = JSON.parse(localStorage.getItem("profileData")) || {};
 
       localStorage.setItem(
         "profileData",
@@ -106,19 +117,11 @@ export default function Profil() {
       alert("Profil berhasil disimpan");
       navigate("/profil-selesai");
 
-    } else {
-
-      alert(result.message);
-
+    } catch (error) {
+      console.error(error);
+      alert("Gagal terhubung ke database cloud: " + error.message);
     }
-
-  } catch (error) {
-
-    console.error(error);
-    alert("Gagal terhubung ke server");
-
-  }
-};
+  };
 
   return (
     <div className="bg-[#f4f7fb] min-h-screen flex flex-col overflow-x-hidden">
@@ -148,7 +151,7 @@ export default function Profil() {
               <Briefcase
                 className="text-blue-900"
                 size={20}
-              />
+                />
 
             </div>
 

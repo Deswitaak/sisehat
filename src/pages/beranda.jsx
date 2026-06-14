@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavbarDashboard from "../components/NavbarDashboard";
 import { useNavigate } from "react-router-dom";
 
@@ -34,6 +34,39 @@ export default function Beranda() {
 
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
+
+  // =========================================================
+  // 🔥 SINKRONISASI LUAR STATUS AKUN (URL RELATIF ANTI-CORS)
+  // =========================================================
+  useEffect(() => {
+    const syncProfileStatus = async () => {
+      const currentUser = JSON.parse(localStorage.getItem("user"));
+      if (!currentUser?.id_user) return;
+
+      try {
+        // Menggunakan URL Relatif agar mengikuti domain hosting secara otomatis
+        const response = await fetch(`/api-sisehat/get_profile.php?id_user=${currentUser.id_user}`);
+        if (!response.ok) return;
+
+        const result = await response.json().catch(() => null);
+
+        // Jika data profil memang belum ada (Akun Baru), set status false secara silent tanpa pop-up eror
+        if (result && result.status === "error") {
+          localStorage.setItem("profileComplete", "false");
+          return;
+        }
+
+        // Jika data ada di database, sinkronkan ke local storage
+        if (result && result.status === "success") {
+          localStorage.setItem("profileComplete", "true");
+        }
+      } catch (error) {
+        console.warn("Sinkronisasi latar beranda aktif dalam mode lokal offline.");
+      }
+    };
+
+    syncProfileStatus();
+  }, []);
 
   // 🔥 TOTAL RESPONDEN
   const totalUMKM = rawData.length;
@@ -413,7 +446,7 @@ export default function Beranda() {
           <div className="rounded-xl bg-white p-4 shadow sm:p-6">
             <h3 className="mb-2 font-semibold text-gray-900">Top 3</h3>
 
-            {data.rankingTop.map((r, i) => (
+            {rawData.length > 0 && data.rankingTop.map((r, i) => (
               <div
                 key={i}
                 className="flex items-center justify-between gap-4 border-b py-2 text-sm sm:text-base"
@@ -427,7 +460,7 @@ export default function Beranda() {
               Bottom 3
             </h3>
 
-            {data.rankingBottom.map((r, i) => (
+            {rawData.length > 0 && data.rankingBottom.map((r, i) => (
               <div
                 key={i}
                 className="flex items-center justify-between gap-4 border-b py-2 text-sm sm:text-base"

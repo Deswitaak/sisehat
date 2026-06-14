@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 
-
 export default function Navbar({ active }) {
   const location = useLocation();
 
@@ -10,6 +9,20 @@ export default function Navbar({ active }) {
     location.pathname === "/login" ||
     location.pathname === "/register" ||
     location.pathname === "/registrasi";
+
+  // Ambil data user secara aman untuk ekstraksi username
+  const currentUser = (() => {
+    try {
+      const data = localStorage.getItem("user");
+      return data ? JSON.parse(data) : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  // 🔥 Sesuaikan dengan key 'username' dari database PHP agar konsisten
+  const displayName = currentUser?.username || currentUser?.name || "User";
+  const avatarLetter = displayName.charAt(0).toUpperCase();
 
   return (
     <nav className="flex justify-between items-center px-12 py-5 bg-white shadow-sm">
@@ -43,13 +56,11 @@ export default function Navbar({ active }) {
           ⚙️
           <div className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-full">
             <span className="text-sm">
-  {JSON.parse(localStorage.getItem("user"))?.name || "User"}
-</span>
+              {displayName}
+            </span>
             <div className="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center text-sm font-bold">
-  {(JSON.parse(localStorage.getItem("user"))?.name || "U")
-    .charAt(0)
-    .toUpperCase()}
-</div>
+              {avatarLetter}
+            </div>
           </div>
         </div>
       )}

@@ -31,6 +31,34 @@ export default function NavbarDashboard() {
   const profileData = safeParse(localStorage.getItem("profileData"));
   const userData = safeParse(localStorage.getItem("user"));
 
+  // =========================================================
+  // 🔥 AUTOMATIC BACKEND SYNC (MENCEGAH ERROR REFUSED DI NAVBAR)
+  // =========================================================
+  useEffect(() => {
+    const syncUserSession = async () => {
+      if (!userData?.id_user) return;
+
+      try {
+        // Menggunakan URL Relatif agar adaptif dengan domain hosting
+        const response = await fetch(`/api-sisehat/get_profile.php?id_user=${userData.id_user}`);
+        if (!response.ok) return;
+
+        const result = await response.json().catch(() => null);
+
+        if (result && result.status === "success" && result.data) {
+          localStorage.setItem("profileData", JSON.stringify(result.data));
+          localStorage.setItem("profileComplete", "true");
+        } else if (result && result.status === "error") {
+          localStorage.setItem("profileComplete", "false");
+        }
+      } catch (error) {
+        console.warn("Koneksi Navbar berjalan dalam mode offline lokal.");
+      }
+    };
+
+    syncUserSession();
+  }, [location.pathname]); // Melakukan pemeriksaan aman setiap kali halaman berpindah
+
   const menu = [
     { name: "Beranda", path: "/beranda" },
     { name: "Asesmen", path: "/asesmen" },
