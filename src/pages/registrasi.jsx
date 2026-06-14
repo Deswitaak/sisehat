@@ -23,7 +23,7 @@ export default function Registrasi() {
     });
   };
 
-  // HANDLE REGISTER (Koneksi ke Back End PHP)
+  // HANDLE REGISTER (Koneksi ke Back End PHP via Ngrok)
   const handleRegister = async () => {
     // Validasi sederhana di sisi client
     if (!form.name || !form.email || !form.phone || !form.password) {
@@ -32,8 +32,8 @@ export default function Registrasi() {
     }
 
     try {
-      // 1. Mengirim data ke API register.php (URL disesuaikan dengan folder XAMPP asli kamu)
-      const response = await fetch('http://localhost/sisehat/api-sisehat/register.php', {
+      // 1. Mengirim data ke API register.php melalui tunnel HTTPS Ngrok yang terhubung ke XAMPP lokal kamu
+      const response = await fetch('https://unlit-armless-jawed.ngrok-free.dev/sisehat/api-sisehat/register.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
