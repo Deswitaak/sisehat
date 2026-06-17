@@ -58,10 +58,13 @@ export default function DetailUMKM() {
     );
   }
 
+  // 🔥 FAKTOR (PERBAIKAN UTAMA: Filter hanya faktor yang memiliki score > 0 agar chart & analisis dinamis sesuai role)
+  const faktorData = (data.factors || []).filter(f => Number(f.score) > 0);
+
   // 🔥 RADAR
   const radarData = {
     labels:
-      data.factors?.map(
+      faktorData.map(
         (f) => f.name
       ) || [],
 
@@ -71,7 +74,7 @@ export default function DetailUMKM() {
           data.nama_usaha,
 
         data:
-          data.factors?.map(
+          faktorData.map(
             (f) => Number(f.score)
           ) || [],
 
@@ -128,10 +131,6 @@ export default function DetailUMKM() {
         "bg-red-100 text-red-600",
     };
   };
-
-  // 🔥 FAKTOR
-  const faktorData =
-    data.factors || [];
 
   // 🔥 SORT
   const sorted =

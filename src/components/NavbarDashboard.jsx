@@ -67,7 +67,8 @@ export default function NavbarDashboard() {
     { name: "Eksplorasi", path: "/eksplorasi" },
   ];
 
-  const displayName = profileData?.nama || userData?.name || "Pengguna";
+  // 🔥 PERBAIKAN: Ditambahkan 'userData?.username' agar nama user tidak kembali menjadi "Pengguna" di menu sidebar/navbar
+  const displayName = profileData?.nama || userData?.username || userData?.name || "Pengguna";
   const displayEmail = userData?.email || "user@email.com";
   const avatarLetter = (displayName || "U").charAt(0).toUpperCase();
 

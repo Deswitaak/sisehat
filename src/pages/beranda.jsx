@@ -221,6 +221,12 @@ export default function Beranda() {
     }
   };
 
+  // Ambil data user login dari localStorage secara dinamis
+  const currentUserObj = JSON.parse(localStorage.getItem("user"));
+  
+  // 🔥 PERBAIKAN SELESAI: Tambahkan .username agar tulisan "Pengguna" berubah menjadi nama akun rill yang masuk
+  const currentDisplayName = profileData?.nama || currentUserObj?.username || currentUserObj?.name || "Pengguna";
+
   return (
     <div className="min-h-screen bg-[#f4f7fb] overflow-x-hidden">
       <NavbarDashboard />
@@ -258,12 +264,13 @@ export default function Beranda() {
       <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 md:py-10 lg:px-12 xl:px-16">
         {/* HEADER */}
         <section>
+          {/* Menggunakan variabel display name ter-update */}
           <h1 className="break-words text-2xl font-bold text-gray-900 md:text-3xl">
-            Halo, {profileData?.nama || "Pengguna"}
+            Halo, {currentDisplayName}
           </h1>
 
           <p className="mt-1 text-sm text-gray-400">
-            Dataset {totalUMKM} Responden UMKM di Jakarta dan Jawa Barat
+            Berikut adalah Dataset {totalUMKM} Responden UMKM di Jakarta dan Jawa Barat
           </p>
         </section>
 

@@ -10,15 +10,13 @@ export default function Eksplorasi() {
 
   const [data, setData] = useState([]);
 
-  // 🔥 SIMULASI DATA API
+  // 🔥 SINKRONISASI DATA RIIL API DATABASE CLOUD
   useEffect(() => {
-    fetch(
-      "http://localhost/sisehat/api-sisehat/get_umkm.php"
-    )
+    // Diubah menjadi URL Relatif agar adaptif menembus domain produksi tanpa diblokir CORS
+    fetch("/api-sisehat/get_umkm.php")
       .then((res) => res.json())
       .then((data) => {
         console.log("API UMKM", data);
-
         setData(data);
       })
       .catch((err) => {
@@ -46,7 +44,7 @@ export default function Eksplorasi() {
 
           <p className="mt-2 text-sm leading-relaxed text-gray-500 sm:text-base">
             Analisis kesehatan organisasi
-            berdasarkan data responden UMKM.
+            based on data responden UMKM.
           </p>
         </section>
 

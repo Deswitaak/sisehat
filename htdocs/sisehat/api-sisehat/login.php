@@ -1,9 +1,11 @@
 <?php
+// 1. PENGATURAN CORS LENGKAP PENEMBUS INFINITYFREE
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; charset=UTF-8");
 
+// 2. PENANGANAN REQUEST PREFLIGHT (OPTIONS) RESMI
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -71,9 +73,7 @@ $cekUsaha = mysqli_query(
 $profileComplete = false;
 
 if ($cekUsaha && mysqli_num_rows($cekUsaha) > 0) {
-
     $usaha = mysqli_fetch_assoc($cekUsaha);
-
     if (
         !empty($usaha['nama_usaha']) &&
         !empty($usaha['jenis_usaha']) &&

@@ -1,9 +1,11 @@
 <?php
+// 1. PENGATURAN CORS LENGKAP PENEMBUS INFINITYFREE
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; charset=UTF-8");
 
+// 2. PENANGANAN REQUEST PREFLIGHT (OPTIONS) RESMI
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -94,12 +96,10 @@ $stmt_user = mysqli_prepare(
 );
 
 if (!$stmt_user) {
-
     echo json_encode([
         "status" => "error",
         "message" => mysqli_error($conn)
     ]);
-
     exit();
 }
 
@@ -113,20 +113,15 @@ mysqli_stmt_bind_param(
 );
 
 if (mysqli_stmt_execute($stmt_user)) {
-
     echo json_encode([
         "status" => "success",
         "message" => "Registrasi Berhasil!"
     ]);
-
 } else {
-
     echo json_encode([
         "status" => "error",
-        "message" => "Gagal menyimpan akun: "
-            . mysqli_stmt_error($stmt_user)
+        "message" => "Gagal menyimpan akun: " . mysqli_stmt_error($stmt_user)
     ]);
-
 }
 
 mysqli_stmt_close($stmt_user);

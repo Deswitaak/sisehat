@@ -12,6 +12,11 @@ export default function Asesmen() {
   const role = profileData?.role || "Pemilik";
   const userId = userData?.id_user;
 
+  // 🔥 PERBAIKAN 1: Mengubah pengambilan tanggal menjadi React State agar re-render UI terpicu otomatis
+  const [lastSavedAssessmentDate, setLastSavedAssessmentDate] = useState(
+    localStorage.getItem("lastAssessmentDate") || ""
+  );
+
   // =========================================================
   // PERTANYAAN OWNER & KARYAWAN
   // =========================================================
@@ -162,6 +167,13 @@ export default function Asesmen() {
 
         if (apiResult.status === "success") {
           console.log("Data berhasil disimpan ke database");
+          
+          // 🔥 PERBAIKAN 2: Simpan ke localStorage DAN ubah State React secara bersamaan agar langsung terekam sebelum pindah halaman
+          if (apiResult.tanggal_simpan) {
+            localStorage.setItem("lastAssessmentDate", apiResult.tanggal_simpan);
+            setLastSavedAssessmentDate(apiResult.tanggal_simpan);
+          }
+
           navigate("/hasil", {
             state: {
               factors: resultFactors,
@@ -194,13 +206,23 @@ export default function Asesmen() {
 
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 md:px-8 md:py-10 lg:px-12 xl:px-16">
         {/* HEADER */}
-        <section>
-          <h1 className="break-words text-2xl font-bold text-blue-900 md:text-3xl">
-            Asesmen Profil Organisasi
-          </h1>
-          <p className="mt-2 text-sm leading-relaxed text-gray-500 sm:text-base">
-            Lengkapi asesmen berdasarkan role Anda.
-          </p>
+        <section className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="break-words text-2xl font-bold text-blue-900 md:text-3xl">
+              Asesmen Profil Organisasi
+            </h1>
+            <p className="mt-2 text-sm leading-relaxed text-gray-500 sm:text-base">
+              Lengkapi asesmen berdasarkan role Anda.
+            </p>
+          </div>
+
+          {/* 🔥 TAMPILAN TANGGAL DISETIAP PENYIMPANAN DATA ASESMEN */}
+          {lastSavedAssessmentDate && (
+            <div className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5 text-xs font-semibold text-blue-900 shadow-sm sm:mt-0 max-w-max">
+              <span>🕒 Terakhir Disimpan:</span>
+              <span className="font-bold text-blue-950">{lastSavedAssessmentDate} WIB</span>
+            </div>
+          )}
         </section>
 
         {/* ROLE INFO */}

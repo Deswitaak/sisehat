@@ -52,79 +52,82 @@ export default function Perbandingan() {
 
   useEffect(() => {
 
-  const user =
-    JSON.parse(localStorage.getItem("user"));
+    const user =
+      JSON.parse(localStorage.getItem("user"));
 
-  if (!user?.id_user) return;
+    if (!user?.id_user) return;
 
-  fetch(
-    `http://localhost/sisehat/api-sisehat/history_assessment.php?id_user=${user.id_user}`
-  )
-    .then((res) => res.json())
-    .then((data) => {
+    // 🔥 Menggunakan URL relatif agar adaptif menembus server hosting InfinityFree
+    fetch(
+      `/api-sisehat/history_assessment.php?id_user=${user.id_user}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        // Amankan agar data selalu berupa array bersih
+        const cleanArray = Array.isArray(data) ? data : (data?.data || []);
+        setAssessmentHistory(cleanArray);
 
-      setAssessmentHistory(data);
+        if (cleanArray.length > 0) {
+          setSelectedAssessment(0);
 
-      if (data.length > 0) {
-        setSelectedAssessment(0);
+          setCurrentFactors(
+            cleanArray[0].factors || []
+          );
 
-        setCurrentFactors(
-          data[0].factors
-        );
+          setCurrentTotal(
+            cleanArray[0].total_score || 0
+          );
 
-        setCurrentTotal(
-          data[0].total_score
-        );
+        }
 
-      }
+      });
 
-    });
-
-}, []);
+  }, []);
 
 
- const [assessmentHistory, setAssessmentHistory] =
-  useState([]);
+  const [assessmentHistory, setAssessmentHistory] =
+    useState([]);
 
-const [selectedAssessment, setSelectedAssessment] =
-  useState(0);
+  const [selectedAssessment, setSelectedAssessment] =
+    useState(0);
 
-const [currentFactors, setCurrentFactors] =
-  useState(factors);
+  const [currentFactors, setCurrentFactors] =
+    useState(factors);
 
-const [currentTotal, setCurrentTotal] =
-  useState(total);
+  const [currentTotal, setCurrentTotal] =
+    useState(total);
 
   // 🔥 PILIHAN INDUSTRI
   const [selectedIndustry, setSelectedIndustry] =
     useState("umkm");
 
-const [industryData, setIndustryData] =
-  useState([]);
+  const [industryData, setIndustryData] =
+    useState([]);
 
   useEffect(() => {
 
-  const kategoriMap = {
-    umkm: "Kuliner",
-    kuliner: "Kuliner",
-    fashion: "Fashion",
-    retail: "Retail",
-    jasa: "Jasa"
-  };
+    const kategoriMap = {
+      umkm: "Kuliner",
+      kuliner: "Kuliner",
+      fashion: "Fashion",
+      retail: "Retail",
+      jasa: "Jasa"
+    };
 
-  fetch(
-    `http://localhost/sisehat/api-sisehat/compare.php?kategori=${kategoriMap[selectedIndustry]}`
-  )
-    .then((res) => res.json())
-    .then((data) => {
+    // 🔥 Menggunakan URL relatif untuk komparasi industri standar
+    fetch(
+      `/api-sisehat/compare.php?kategori=${kategoriMap[selectedIndustry]}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
 
-      setIndustryData(
-        data.factors || []
-      );
+        setIndustryData(
+          data.factors || []
+        );
 
-    });
+      });
 
-}, [selectedIndustry]);
+  }, [selectedIndustry]);
 
   // 🔥 INDUSTRI
   const industryOptions = [
@@ -156,58 +159,34 @@ const [industryData, setIndustryData] =
 
   ];
 
- const filteredIndustry =
-  industryData.filter(
-    (item) =>
-      currentFactors.some(
-        (f) =>
-          f.name === item.name
-      )
+  // 🔥 SINKRONISASI ATURAN ROLE DARI FRONTEND:
+  // Kita hanya memfilter data industri yang namanya cocok dengan faktor yang diisi oleh user saat ini
+  const filteredIndustry = industryData.filter((item) =>
+    currentFactors.some((f) => f.name === item.name || f.code === item.code)
   );
-  console.log("CURRENT", currentFactors);
-console.log("INDUSTRY", industryData);
-console.log("FILTERED", filteredIndustry);
 
-  // 🔥 chart
+  // 🔥 CHART DATA (DIBUAT 100% DINAMIS MENGIKUTI JUMLAH FAKTOR USER/KARYAWAN)
   const chartData = {
-
-   labels:
-  currentFactors.map((f) => f.name),
+    // Labels hanya memuat nama faktor yang diisi oleh user (bisa 3 faktor atau 4 faktor)
+    labels: currentFactors.map((f) => f.name),
 
     datasets: [
-
       {
         label: "Hasil Anda",
-
-        data:
-  currentFactors.map(
-    (f) => f.score
-  ),
-
-        backgroundColor:
-          "rgba(59,130,246,0.2)",
-
-        borderColor:
-          "#163456",
+        data: currentFactors.map((f) => f.score),
+        backgroundColor: "rgba(59,130,246,0.2)",
+        borderColor: "#163456",
       },
-
       {
-        label:
-          industryOptions.find(
-            (i) =>
-              i.id === selectedIndustry
-          )?.label,
-
-       data:
-  filteredIndustry.map(
-    (f) => f.score
-  ),
-        borderColor:
-          "#9ca3af",
-
+        label: industryOptions.find((i) => i.id === selectedIndustry)?.label,
+        // Data industri dipetakan urutannya secara presisi mencocokkan nama faktor user saat ini
+        data: currentFactors.map((userFactor) => {
+          const match = industryData.find((indFactor) => indFactor.name === userFactor.name);
+          return match ? match.score : 0;
+        }),
+        borderColor: "#9ca3af",
         borderDash: [5, 5],
       },
-
     ],
   };
 
@@ -259,46 +238,49 @@ console.log("FILTERED", filteredIndustry);
 
             </p>
 
-      <select
-  value={selectedAssessment}
-  onChange={(e) => {
+            <select
+              value={selectedAssessment}
+              onChange={(e) => {
 
-    const index =
-      Number(e.target.value);
+                const index = Number(e.target.value);
 
-    setSelectedAssessment(index);
+                setSelectedAssessment(index);
 
-    setCurrentFactors(
-      assessmentHistory[index]
-        ?.factors || []
-    );
+                setCurrentFactors(
+                  assessmentHistory[index]?.factors || []
+                );
 
-    setCurrentTotal(
-      assessmentHistory[index]
-        ?.total_score || 0
-    );
+                setCurrentTotal(
+                  assessmentHistory[index]?.total_score || 0
+                );
 
-  }}
-  className="w-full border p-3 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-900"
->
+              }}
+              className="w-full border p-3 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-900"
+            >
 
-              {assessmentHistory.map(
-  (item, index) => (
+              {Array.isArray(assessmentHistory) && assessmentHistory.map(
+                (item, index) => {
+                  const rawDate = item.tanggal_asesmen || item.tanggal_simpan || new Date().toISOString();
+                  
+                  let formattedDate = rawDate;
+                  if (typeof rawDate === "string" && !rawDate.includes(" ")) {
+                    const parsed = new Date(rawDate);
+                    if (!isNaN(parsed)) {
+                      formattedDate = parsed.toLocaleDateString("id-ID", {
+                        day: "2-digit",
+                        month: "long",
+                        year: "numeric",
+                      });
+                    }
+                  }
 
-  <option
-  key={index}
-  value={index}
->
-  {new Date(item.tanggal_asesmen)
-    .toLocaleDateString("id-ID", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    })}
-</option>
-
-  )
-)}
+                  return (
+                    <option key={index} value={index}>
+                      {formattedDate}
+                    </option>
+                  );
+                }
+              )}
 
             </select>
 
@@ -320,7 +302,7 @@ console.log("FILTERED", filteredIndustry);
                   e.target.value
                 )
               }
-            className="w-full border p-3 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-900"
+              className="w-full border p-3 rounded-lg bg-white outline-none focus:ring-2 focus:ring-blue-900"
             >
 
               {industryOptions.map(
@@ -352,7 +334,7 @@ console.log("FILTERED", filteredIndustry);
 
             <h3 className="font-semibold text-blue-900 mb-4">
 
-              Visualisasi 6 Faktor Strategis
+              Visualisasi Faktor Strategis
 
             </h3>
 
@@ -364,20 +346,20 @@ console.log("FILTERED", filteredIndustry);
             </div>
             <p className="text-sm text-gray-500 mt-4 leading-relaxed">
 
-  Membandingkan dengan{" "}
+              Membandingkan dengan{" "}
 
-  <span className="font-semibold text-blue-900">
+              <span className="font-semibold text-blue-900">
 
-    {
-      industryOptions.find(
-        (i) =>
-          i.id === selectedIndustry
-      )?.label
-    }
+                {
+                  industryOptions.find(
+                    (i) =>
+                      i.id === selectedIndustry
+                  )?.label
+                }
 
-  </span>
+              </span>
 
-</p>
+            </p>
 
           </div>
 
@@ -434,46 +416,46 @@ console.log("FILTERED", filteredIndustry);
         </div>
 
         {/* SUMMARY */}
-<div className="bg-white p-5 sm:p-6 rounded-xl shadow mt-4 sm:mt-6">
+        <div className="bg-white p-5 sm:p-6 rounded-xl shadow mt-4 sm:mt-6">
 
-  <h3 className="font-semibold text-blue-900 mb-3">
+          <h3 className="font-semibold text-blue-900 mb-3">
 
-    Ringkasan Analisis
+            Ringkasan Analisis
 
-  </h3>
+          </h3>
 
-  <p className="text-sm text-gray-600 leading-relaxed">
+          <p className="text-sm text-gray-600 leading-relaxed">
 
-    Bisnis Anda memiliki performa{" "}
+            Bisnis Anda memiliki performa{" "}
 
-    <span className="font-semibold text-blue-900">
+            <span className="font-semibold text-blue-900">
 
-      {
-        currentTotal >= 85
-          ? "sangat baik"
-          : currentTotal >= 70
-          ? "cukup stabil"
-          : "yang masih perlu ditingkatkan"
-      }
+              {
+                currentTotal >= 85
+                  ? "sangat baik"
+                  : currentTotal >= 70
+                    ? "cukup stabil"
+                    : "yang masih perlu ditingkatkan"
+              }
 
-    </span>
+            </span>
 
-    {" "}dibandingkan rata-rata{" "}
+            {" "}dibandingkan rata-rata{" "}
 
-    <span className="font-semibold text-blue-900">
+            <span className="font-semibold text-blue-900">
 
-      {
-        industryOptions.find(
-          (i) =>
-            i.id === selectedIndustry
-        )?.label
-      }
+              {
+                industryOptions.find(
+                  (i) =>
+                    i.id === selectedIndustry
+                )?.label
+              }
 
-    </span>.
+            </span>.
 
-  </p>
+          </p>
 
-</div>
+        </div>
 
         {/* TABLE */}
         <div className="bg-white mt-6 sm:mt-8 rounded-xl shadow overflow-hidden">
@@ -528,11 +510,11 @@ console.log("FILTERED", filteredIndustry);
                 {currentFactors.map(
                   (item, i) => {
 
-                   const avg =
-    filteredIndustry.find(
-      (f) =>
-        f.name === item.name
-    )?.score || 0;
+                    const avg =
+                      industryData.find(
+                        (f) =>
+                          f.name === item.name
+                      )?.score || 0;
                     const delta =
                       item.score - avg;
 
@@ -594,9 +576,9 @@ console.log("FILTERED", filteredIndustry);
                 "/rekomendasi",
                 {
                   state: {
-  factors: currentFactors,
-  total: currentTotal,
-},
+                    factors: currentFactors,
+                    total: currentTotal,
+                  },
                 }
               )
             }

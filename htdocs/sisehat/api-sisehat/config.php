@@ -9,10 +9,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Konfigurasi Database Local XAMPP
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "sisehat";
+$host = "sql101.infinityfree.com";
+$user = "if0_41965157";
+$pass = "P1nkMestatis";
+$db   = "if0_41965157_sisehat";
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 

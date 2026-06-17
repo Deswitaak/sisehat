@@ -1,9 +1,17 @@
 <?php
+// 🔥 GUNAKAN OUTPUT BUFFERING UNTUK MENANGKAP DAN MEMBUANG TEKS EROR HTML HOSTING
+ob_start();
+
+// Set zona waktu ke WIB (Jakarta) agar jam penyimpanan akurat
+date_default_timezone_set('Asia/Jakarta');
+
+// 1. PENGATURAN CORS LENGKAP PENEMBUS INFINITYFREE
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 header("Content-Type: application/json; charset=UTF-8");
 
+// 2. PENANGANAN REQUEST PREFLIGHT (OPTIONS) RESMI
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -14,22 +22,13 @@ include 'config.php';
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Mencocokkan request parameter dari asesmen.jsx frontend (id_user dan answers)
 if (isset($data['id_user']) && isset($data['answers'])) {
     $id_user = intval($data['id_user']);
     $answers = $data['answers'];
     $role    = isset($data['role']) ? $data['role'] : 'Pemilik';
 
-    // Inisialisasi variabel skor faktor awal
-    $ov = 0;
-    $li = 0;
-    $ir = 0;
-    $ep = 0;
-    $os = 0;
-    $qw = 0;
+    $ov = 0; $li = 0; $ir = 0; $ep = 0; $os = 0; $qw = 0;
 
-    // Fungsi bantu untuk menghitung skor rata-rata per section langkah (step)
-    // Formula: (Total Nilai Jawaban / (Jumlah Pertanyaan * Skala Maksimal)) * 100
     function hitungSkorSection($answers, $stepIndex, $jumlahPertanyaan, $maxScale)
     {
         $total = 0;
@@ -41,25 +40,21 @@ if (isset($data['id_user']) && isset($data['answers'])) {
         return ($total / ($jumlahPertanyaan * $maxScale)) * 100;
     }
 
-    // Pemrosesan kalkulasi berdasarkan Role Akun
     if ($role === "Karyawan") {
-        // Karyawan memiliki 3 Kategori (Step 0: OV [6 soal], Step 1: QW [4 soal], Step 2: LI [3 soal])
-        $ov = hitungSkorSection($answers, 0, 4, 5); // Organizational Values (4 soal, skala 5)
-        $qw = hitungSkorSection($answers, 1, 4, 5); // Quality of Workplace (4 soal, skala 5)
-        $li = hitungSkorSection($answers, 2, 3, 5); // Leader Involvement (3 soal, skala 5)
+        $ov = hitungSkorSection($answers, 0, 4, 5); 
+        $qw = hitungSkorSection($answers, 1, 4, 5); 
+        $li = hitungSkorSection($answers, 2, 3, 5); 
 
         $total_score = ($ov + $qw + $li) / 3;
     } else {
-        // Pemilik memiliki 4 Kategori 
-        $ov = hitungSkorSection($answers, 0, 6, 5); // Organizational Values (6 soal, skala 5)
-        $ir = hitungSkorSection($answers, 1, 6, 3); // Institutional Resources (6 soal, skala 3)
-        $os = hitungSkorSection($answers, 2, 5, 5); // Operational Stability (5 soal, skala 5)
-        $ep = hitungSkorSection($answers, 3, 4, 5); // Economic Performance (4 soal, skala 5)
+        $ov = hitungSkorSection($answers, 0, 6, 5); 
+        $ir = hitungSkorSection($answers, 1, 6, 3); 
+        $os = hitungSkorSection($answers, 2, 5, 5); 
+        $ep = hitungSkorSection($answers, 3, 4, 5); 
 
         $total_score = ($ov + $ir + $os + $ep) / 4;
     }
 
-    // Penentuan otomatis status berdasarkan threshold nilai akhir
     if ($total_score >= 85) {
         $status = "Optimal";
     } elseif ($total_score >= 70) {
@@ -68,7 +63,6 @@ if (isset($data['id_user']) && isset($data['answers'])) {
         $status = "Perlu Perhatian";
     }
 
-    // Amankan nilai desimal maksimal 2 angka di belakang koma
     $total_score = round($total_score, 2);
     $ov = round($ov, 2);
     $li = round($li, 2);
@@ -80,15 +74,25 @@ if (isset($data['id_user']) && isset($data['answers'])) {
     $query = "INSERT INTO asesmen (id_user, total_score, status, ov_score, li_score, ir_score, ep_score, os_score, qw_score) 
               VALUES ($id_user, $total_score, '$status', $ov, $li, $ir, $ep, $os, $qw)";
 
+    // Ambil string waktu lokal untuk dikirim balik ke React frontend
+    $tanggal_sekarang = date('d F Y, H:i');
+
+    ob_end_clean();
+
     if (mysqli_query($conn, $query)) {
         echo json_encode([
             "status" => "success",
             "message" => "Hasil asesmen berhasil disimpan",
-            "calculated_total" => $total_score
+            "calculated_total" => $total_score,
+            "tanggal_simpan" => $tanggal_sekarang // 🔥 Kirim data tanggal simpan ter-update
         ]);
     } else {
         echo json_encode(["status" => "error", "message" => "Gagal menyimpan ke database: " . mysqli_error($conn)]);
     }
 } else {
+    ob_end_clean();
     echo json_encode(["status" => "error", "message" => "Data hasil asesmen tidak lengkap atau format salah"]);
 }
+
+mysqli_close($conn);
+?>
